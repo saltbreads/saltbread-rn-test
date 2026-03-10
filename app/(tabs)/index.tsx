@@ -1,3 +1,4 @@
+// app/(tabs)/index.tsx
 import React from "react";
 import { SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { WebView } from "react-native-webview";
