@@ -1,6 +1,7 @@
 // app/(tabs)/index.tsx
 import React from "react";
-import { SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 
 const WEB_URL = "http://10.0.2.2:3000/"; // Android Emulator -> Mac localhost
