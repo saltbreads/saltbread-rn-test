@@ -6,10 +6,12 @@ import MapMarker from './MapMarker';
 
 interface NaverMapViewProps {
   shops: any[];
+  onMarkerPress: (shop: any) => void;
 }
 
-const NaverMapViewComponent = ({ shops }: NaverMapViewProps) => {
+const NaverMapViewComponent = ({ shops, onMarkerPress }: NaverMapViewProps) => {
   // 동대구역 좌표
+  // @TODO constants로 바꾸기
   const DONGDAEGU_STATION = {
     latitude: 35.8774,
     longitude: 128.6274,
@@ -26,7 +28,11 @@ const NaverMapViewComponent = ({ shops }: NaverMapViewProps) => {
         }}
       >
         {shops.map((shop) => (
-          <MapMarker key={shop.id} shop={shop} />
+          <MapMarker
+          key={shop.id}
+          shop={shop}
+          onPress={onMarkerPress} // 부모로부터 받은 함수를 그대로 전달 
+          />
         ))}
       </NaverMapView>
     </View>
