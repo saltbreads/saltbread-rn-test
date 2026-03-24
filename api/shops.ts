@@ -34,3 +34,29 @@ export const fetchShopDetail = async (shopId: string) => {
     return null;
   }
 };
+
+export const fetchShopPhotoHighlights = async (shopId: string) => {
+  try {
+    const response = await fetch(`${BASE_URL.API_URL}/shops/${shopId}/photo-highlights`);
+    if (!response.ok) throw new Error("사진 하이라이트를 불러오는데 실패했습니다.");
+    
+    const json = await response.json();
+    
+    if (json.success && json.data) {
+      const { hero, items } = json.data;
+      // hero와 items 배열을 합쳐 하나의 URL 배열로 만듭니다.
+      const imageUrls: string[] = [];
+      if (hero?.url) imageUrls.push(hero.url);
+      if (items && items.length > 0) {
+        items.forEach((item: any) => {
+          if (item.url) imageUrls.push(item.url);
+        });
+      }
+      return imageUrls; // ["heroUrl", "reviewUrl1", ...]
+    }
+    return [];
+  } catch (error) {
+    console.error('Failed to fetch photo highlights:', error);
+    return [];
+  }
+};
