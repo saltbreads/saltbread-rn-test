@@ -5,9 +5,10 @@ import { NaverMapMarkerOverlay } from '@mj-studio/react-native-naver-map';
 interface MapMarkerProps {
   shop: any; // 가게 전체 데이터를 받음
   onPress: (shop: any) => void; // 클릭 시 가게 전체 정보를 부모에게 전달
+  isSelected: boolean;
 }
 
-const MapMarker = ({ shop, onPress }: MapMarkerProps) => {
+const MapMarker = ({ shop, onPress,isSelected }: MapMarkerProps) => {
   return (
     <NaverMapMarkerOverlay
       latitude={shop.latitude}
@@ -17,14 +18,22 @@ const MapMarker = ({ shop, onPress }: MapMarkerProps) => {
       caption={{
         text: shop.name,
         textSize: 12,
-        color: '#333',
+        // 선택되었을 때 텍스트 색상을 오렌지로 변경
+        color: isSelected ? '#FF8C00' : '#333',
         haloColor: '#fff',
       }}
       // 로컬 이미지를 넣을 때는 'image' prop을 사용합니다.
       // @TODO 하드코딩 바꾸기
-      image={require('../../../assets/images/saltBreadPin.png')}
-      width={35}
-      height={35}
+      image={
+        isSelected 
+          ? require('../../../assets/images/saltBreadPin.png') // 👈 @TODO 준비필요
+          : require('../../../assets/images/saltBreadPin.png')
+      }
+      // 선택되었을 때 핀의 크기를 살짝 키워서 강조 (35 -> 45)
+      width={isSelected ? 45 : 35}
+      height={isSelected ? 45 : 35}
+      // 선택된 마커가 다른 마커보다 항상 위에 보이도록 설정
+      zIndex={isSelected ? 100 : 1}
     />
   );
 };

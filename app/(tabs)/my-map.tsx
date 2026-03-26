@@ -1,5 +1,6 @@
 // app/(tabs)/my-map.tsx
 import ShopDetailSheet from "@/components/features/map/ShopDetailSheet";
+import { useMapControl } from "@/hooks/map/useMapControl";
 import { useShopDetail } from "@/hooks/shop/useShopDetail";
 import { useShops } from "@/hooks/shop/useShops";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -10,7 +11,7 @@ import NaverMapViewComponent from "../../components/features/map/NaverMapView";
 
 export default function MyMapScreen() {
   //useShops - 가게 x,y 정보 fetch하는 훅
-  const { shops, isLoading } = useShops();
+  const { shops, isLoading: isListLoading } = useShops();
   const {
     selectedShop,
     photos,
@@ -18,7 +19,10 @@ export default function MyMapScreen() {
     getDetail,
   } = useShopDetail();
 
-  
+  // 지도 컨트롤 로직
+  const { mapRef, selectedShopId, selectMarker, clearSelection } =
+    useMapControl();
+
   // 1. 바텀 시트를 조절하기 위한 Ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -29,15 +33,19 @@ export default function MyMapScreen() {
 
   const handleMarkerPress = useCallback(
     (shop: any) => {
+      // 1. 지도 중앙 이동 및 마커 활성화 (훅 사용)
+      selectMarker(shop.id, shop.latitude, shop.longitude);
+      // 2. 바텀시트 올리기
       bottomSheetRef.current?.snapToIndex(0);
-      getDetail(shop.id); // 훅을 통해 데이터 페칭
+      // 3. 상세 데이터 페칭
+      getDetail(shop.id);
     },
-    [getDetail]
+    [selectMarker, getDetail]
   );
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      {isLoading ? (
+      {isListLoading ? (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="#FF8C00" />
         </View>
@@ -46,13 +54,19 @@ export default function MyMapScreen() {
           {/* 지도를 그리는 컴포넌트 */}
           <NaverMapViewComponent
             shops={shops}
-            onMarkerPress={handleMarkerPress} // 함수 전달!
+            onMarkerPress={handleMarkerPress}
+            ref={mapRef}
+            selectedShopId={selectedShopId}
+            
           />
           <BottomSheet
             ref={bottomSheetRef}
             index={-1}
             snapPoints={snapPoints}
             enablePanDownToClose
+            onChange={(index) => {
+              if (index === -1) clearSelection(); // 👈 시트 닫히면 선택 해제
+            }}
           >
             <BottomSheetView>
               <ShopDetailSheet
