@@ -1,18 +1,18 @@
 // components/features/map/ShopDetailSheet.tsx
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
-  Linking,
-  FlatList,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Image } from 'expo-image';
+import ShopTabs, { ShopTabType } from './ShopTabs';
+import ShopHeader from './ShopHeader';
+import ShopInfoHome from './ShopInfoHome';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window"); // 화면 너비 가져오기
 
@@ -23,6 +23,8 @@ interface Props {
 }
 
 const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
+  const [activeTab, setActiveTab] = useState<ShopTabType>('홈');
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -34,104 +36,42 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
 
   if (!shop) return null;
 
-  // 전화걸기 함수
-  const handlePhoneCall = (phoneNumber: string) => {
-    Linking.openURL(`tel:${phoneNumber}`);
+  // 👈 테스트를 위한 데이터 뻥튀기 로직
+  const getDummyPhotos = () => {
+    if (!photos || photos.length === 0) return [];
+    // 기존 사진 URL 뒤에 인덱스를 붙여 고유하게 만듭니다.
+    // ['url1', 'url2', 'url1_idx0', 'url2_idx0', 'url1_idx1', 'url2_idx1']
+    return [
+      ...photos,
+      ...photos.map((url, idx) => `${url}_idx${idx}`), // 👈 고유한 URL 생성
+      ...photos.map((url, idx) => `${url}_idx${idx + photos.length}`), // 👈 또 고유한 URL 생성
+    ];
   };
-
-  // 인스타그램 열기 함수
-  const handleInstagram = (url: string) => {
-    if (url) Linking.openURL(url);
-  };
-
-  // 횡스크롤 이미지 배너 렌더링 함수
-  const renderPhotoItem = ({ item }: { item: string }) => (
-    <Image 
-      source={{ uri: item }} 
-      style={styles.photo} 
-      contentFit="cover" // 이미지 비율 유지하며 채우기
-      transition={300} // 로딩 시 페이드인 효과
-    />
-  );
 
   return (
     <View style={styles.container}>
-      {/* 상단 사진 횡스크롤 영역 추가 */}
-      {photos && photos.length > 0 ? (
-        <View style={styles.photoSection}>
-          <FlatList
-            data={photos}
-            renderItem={renderPhotoItem}
-            keyExtractor={(item) => item}
-            horizontal // 가로 스크롤 활성화
-            showsHorizontalScrollIndicator={false} // 스크롤바 숨기기
-            snapToInterval={SCREEN_WIDTH - 48} // 한 장씩 멈추는 효과 (패딩 고려)
-            decelerationRate="fast"
-            contentContainerStyle={styles.photoListContent}
-          />
-        </View>
-      ) : (
-        // 사진이 없을 때 대체할 기본 소금빵 아이콘 또는 회색 박스
-        <View style={styles.noPhotoBox}>
-          <Ionicons name="image-outline" size={40} color="#ccc" />
-        </View>
-      )}
 
+      {/* 1. 상단 헤더 (사진 + 이름) */}
+      <ShopHeader 
+      name={shop.name}
+      // photos={photos}
+      
+      //테스트용
+      photos={getDummyPhotos()}
+       />
 
-      {/* 상단 제목 섹션 */}
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={1}>
-            {shop.name}
-          </Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>🥐 소금빵 맛집</Text>
-          </View>
-        </View>
+      {/* 2. 탭 바 */}
+      <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* 3. 탭별 컨텐츠 분기 */}
+      <View style={styles.content}>
+        {activeTab === '홈' && <ShopInfoHome shop={shop} />}
+        {activeTab === '메뉴' && <View><Text>메뉴 리스트 준비 중...</Text></View>}
+        {activeTab === '리뷰' && <View><Text>리뷰 리스트 준비 중...</Text></View>}
+        {activeTab === '사진' && <View><Text>전체 사진 그리드 준비 중...</Text></View>}
       </View>
 
-      {/* 상세 정보 리스트 섹션 */}
-      <View style={styles.infoSection}>
-        {/* 주소 */}
-        <InfoItem
-          icon="location-outline"
-          text={shop.address?.road || "주소 정보가 없습니다."}
-        />
-
-        {/* 영업 시간 */}
-        <InfoItem
-          icon="time-outline"
-          text={shop.hoursRaw || "영업시간 정보가 없습니다."}
-        />
-
-        {/* 전화번호 (클릭 시 전화연결) */}
-        {shop.telephone && (
-          <TouchableOpacity onPress={() => handlePhoneCall(shop.telephone)}>
-            <InfoItem
-              icon="call-outline"
-              text={shop.telephone}
-              isLink
-              iconColor="#007AFF"
-            />
-          </TouchableOpacity>
-        )}
-
-        {/* 인스타그램 (클릭 시 앱 연결) */}
-        {shop.links?.instagram && (
-          <TouchableOpacity
-            onPress={() => handleInstagram(shop.links.instagram)}
-          >
-            <InfoItem
-              icon="logo-instagram"
-              text="인스타그램 방문하기"
-              isLink
-              iconColor="#E1306C"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* 하단 메인 버튼 */}
+      {/* 하단 상세정보 버튼 */}
       <TouchableOpacity
         style={styles.mainButton}
         onPress={() => console.log("상세페이지 이동")} // 나중에 WebView 연결할 곳
@@ -143,18 +83,13 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
   );
 };
 
-// 재사용 가능한 정보 아이템 컴포넌트
-const InfoItem = ({ icon, text, isLink, iconColor = "#666" }: any) => (
-  <View style={styles.item}>
-    <Ionicons name={icon} size={20} color={iconColor} />
-    <Text style={[styles.text, isLink && styles.linkText]}>{text}</Text>
-  </View>
-);
+
 
 const styles = StyleSheet.create({
   container: { paddingHorizontal: 24, paddingVertical: 10 },
   center: { padding: 50, alignItems: "center", justifyContent: "center" },
   loadingText: { marginTop: 10, color: "#999", fontSize: 14 },
+  content: { minHeight: 150, marginBottom: 20 },
   header: { marginBottom: 20 },
   title: {
     fontSize: 24,
