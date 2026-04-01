@@ -1,5 +1,6 @@
 // components/features/map/ShopDetailSheet.tsx
 import { Ionicons } from "@expo/vector-icons";
+import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -10,9 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ShopTabs, { ShopTabType } from './ShopTabs';
-import ShopHeader from './ShopHeader';
-import ShopInfoHome from './ShopInfoHome';
+import ShopHeader from "./ShopHeader";
+import ShopInfoHome from "./ShopInfoHome";
+import ShopMenu from "./ShopMenu";
+import ShopTabs, { ShopTabType } from "./ShopTabs";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window"); // 화면 너비 가져오기
 
@@ -23,7 +25,7 @@ interface Props {
 }
 
 const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
-  const [activeTab, setActiveTab] = useState<ShopTabType>('홈');
+  const [activeTab, setActiveTab] = useState<ShopTabType>("홈");
 
   if (isLoading) {
     return (
@@ -49,26 +51,33 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
   };
 
   return (
-    <View style={styles.container}>
-
+    <BottomSheetView style={styles.container}>
       {/* 1. 상단 헤더 (사진 + 이름) */}
-      <ShopHeader 
-      name={shop.name}
-      // photos={photos}
-      
-      //테스트용
-      photos={getDummyPhotos()}
-       />
+      <ShopHeader
+        name={shop.name}
+        photos={photos}
+        //테스트용
+        // photos={getDummyPhotos()}
+      />
 
       {/* 2. 탭 바 */}
       <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* 3. 탭별 컨텐츠 분기 */}
-      <View style={styles.content}>
-        {activeTab === '홈' && <ShopInfoHome shop={shop} />}
-        {activeTab === '메뉴' && <View><Text>메뉴 리스트 준비 중...</Text></View>}
-        {activeTab === '리뷰' && <View><Text>리뷰 리스트 준비 중...</Text></View>}
-        {activeTab === '사진' && <View><Text>전체 사진 그리드 준비 중...</Text></View>}
+      {/* 아래 스타일 추후 styles적용 */}
+      <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}>
+        {activeTab === "홈" && <ShopInfoHome shop={shop} />}
+        {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
+        {activeTab === "리뷰" && (
+          <View>
+            <Text>리뷰 리스트 준비 중...</Text>
+          </View>
+        )}
+        {activeTab === "사진" && (
+          <View>
+            <Text>전체 사진 그리드 준비 중...</Text>
+          </View>
+        )}
       </View>
 
       {/* 하단 상세정보 버튼 */}
@@ -79,14 +88,12 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
         <Text style={styles.mainButtonText}>가게 상세 정보 더보기</Text>
         <Ionicons name="chevron-forward" size={18} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </BottomSheetView>
   );
 };
 
-
-
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: 24, paddingVertical: 10 },
+  container: { paddingHorizontal: 24, flex: 1 },
   center: { padding: 50, alignItems: "center", justifyContent: "center" },
   loadingText: { marginTop: 10, color: "#999", fontSize: 14 },
   content: { minHeight: 150, marginBottom: 20 },
@@ -144,20 +151,20 @@ const styles = StyleSheet.create({
   // 사진 섹션 스타일 추가
   photoSection: { marginHorizontal: -24, marginBottom: 12 }, // 부모 패딩 무시하고 화면 꽉 채우기
   photoListContent: { paddingHorizontal: 24 }, // 양 끝 여백
-  photo: { 
+  photo: {
     width: SCREEN_WIDTH - 64, // 사진 한 장 너비 (스크롤 간격 조절)
     height: 180, // 사진 높이
     borderRadius: 14, // 사진 모서리 둥글게
-    marginRight: 16 // 사진 사이 간격
+    marginRight: 16, // 사진 사이 간격
   },
-  noPhotoBox: { 
-    width: '100%', 
-    height: 120, 
-    backgroundColor: '#f5f5f5', 
-    borderRadius: 14, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginBottom: 16
+  noPhotoBox: {
+    width: "100%",
+    height: 120,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
   },
 });
 
