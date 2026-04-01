@@ -60,3 +60,19 @@ export const fetchShopPhotoHighlights = async (shopId: string) => {
     return [];
   }
 };
+
+export const fetchShopMenus = async (shopId: string) => {
+  try {
+    const url = `${BASE_URL.API_URL}/shops/${shopId}/menus`;
+    const response = await fetch(url);
+    const json = await response.json();
+    
+    if (json.success) {
+      return json.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("❌ fetchShopMenus 에러 발생:", error);
+    return [];
+  }
+};
