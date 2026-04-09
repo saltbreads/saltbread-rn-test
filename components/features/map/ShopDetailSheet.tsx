@@ -16,7 +16,7 @@ import ShopInfoHome from "./ShopInfoHome";
 import ShopMenu from "./ShopMenu";
 import ShopTabs, { ShopTabType } from "./ShopTabs";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window"); // 화면 너비 가져오기
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window"); // 화면 너비 가져오기
 
 interface Props {
   shop: any;
@@ -26,6 +26,7 @@ interface Props {
 
 const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
   const [activeTab, setActiveTab] = useState<ShopTabType>("홈");
+  const [contentHeight, setContentHeight] = useState(400);
 
   if (isLoading) {
     return (
@@ -38,34 +39,30 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
 
   if (!shop) return null;
 
-  // 👈 테스트를 위한 데이터 뻥튀기 로직
-  const getDummyPhotos = () => {
-    if (!photos || photos.length === 0) return [];
-    // 기존 사진 URL 뒤에 인덱스를 붙여 고유하게 만듭니다.
-    // ['url1', 'url2', 'url1_idx0', 'url2_idx0', 'url1_idx1', 'url2_idx1']
-    return [
-      ...photos,
-      ...photos.map((url, idx) => `${url}_idx${idx}`), // 👈 고유한 URL 생성
-      ...photos.map((url, idx) => `${url}_idx${idx + photos.length}`), // 👈 또 고유한 URL 생성
-    ];
-  };
-
   return (
-    <BottomSheetView style={styles.container}>
+    <BottomSheetView 
+      style={styles.container}
+      // 2. 바텀시트 전체가 그려질 때 남은 공간을 계산합니다.
+      onLayout={(e) => {
+        const { height } = e.nativeEvent.layout;
+        if (height > 0) {
+          // 전체 높이에서 헤더/탭바/버튼 대략적인 높이(약 350)를 빼서 설정
+          // (혹은 시트가 snapPoints에 따라 동적으로 변한다면 유용함)
+          setContentHeight(height - 300); 
+        }
+      }}
+    >
       {/* 1. 상단 헤더 (사진 + 이름) */}
-      <ShopHeader
-        name={shop.name}
-        photos={photos}
-        //테스트용
-        // photos={getDummyPhotos()}
-      />
+      <ShopHeader name={shop.name} photos={photos} />
 
       {/* 2. 탭 바 */}
       <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* 3. 탭별 컨텐츠 분기 */}
       {/* 아래 스타일 추후 styles적용 */}
-      <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}>
+      {/* <View style={{  height:contentHeight}}> */}
+      <View style={{ height:SCREEN_HEIGHT * 0.45 }}>
+        {/* <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}> */}
         {activeTab === "홈" && <ShopInfoHome shop={shop} />}
         {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
         {activeTab === "리뷰" && (
@@ -81,13 +78,16 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       </View>
 
       {/* 하단 상세정보 버튼 */}
-      <TouchableOpacity
-        style={styles.mainButton}
-        onPress={() => console.log("상세페이지 이동")} // 나중에 WebView 연결할 곳
-      >
-        <Text style={styles.mainButtonText}>가게 상세 정보 더보기</Text>
-        <Ionicons name="chevron-forward" size={18} color="#fff" />
-      </TouchableOpacity>
+      {/* <View style={{ paddingVertical: 16 }}> */}
+        {/* 버튼을 감싸는 여백 */}
+        <TouchableOpacity
+          style={[styles.mainButton,{ marginTop: 10, marginBottom: 10 }]}
+          onPress={() => console.log("상세페이지 이동")} // 나중에 WebView 연결할 곳
+        >
+          <Text style={styles.mainButtonText}>가게 상세 정보 더보기</Text>
+          <Ionicons name="chevron-forward" size={18} color="#fff" />
+        </TouchableOpacity>
+      {/* </View> */}
     </BottomSheetView>
   );
 };
