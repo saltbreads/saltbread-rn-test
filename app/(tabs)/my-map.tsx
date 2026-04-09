@@ -27,7 +27,7 @@ export default function MyMapScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // 2. 시트가 멈추는 높이 (35% 지점, 60% 지점)
-  const snapPoints = useMemo(() => ["35%", "60%"], []);
+  const snapPoints = useMemo(() => ["40%", "100%"], []);
 
   // 3. 마커 클릭 시 실행될 함수 (NaverMapViewComponent로 전달할 것)
 

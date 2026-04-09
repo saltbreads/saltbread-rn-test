@@ -5,6 +5,7 @@ import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Image } from 'expo-image';
 import { useShopMenus } from '@/hooks/shop/useShopMenus';
 import { ShopMenuData } from '@/types/shop'; 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   shopId: string;
@@ -12,6 +13,9 @@ interface Props {
 
 const ShopMenu = ({ shopId }: Props) => {
   const { menus, isLoading, getMenus } = useShopMenus(shopId);
+  const insets = useSafeAreaInsets();
+  console.log("현재 shopId:", shopId); // 👈 로그 찍어보기
+  console.log("메뉴 데이터 길이:", menus?.length); // 👈 데이터가 오는지 확인
 
   useEffect(() => {
     getMenus();
@@ -44,6 +48,7 @@ const ShopMenu = ({ shopId }: Props) => {
   );
 
   return (
+    
     <BottomSheetFlatList
       data={menus}
       renderItem={renderMenuItem}
@@ -51,7 +56,7 @@ const ShopMenu = ({ shopId }: Props) => {
       // 👈 1. 스타일 추가: 리스트 자체가 남은 공간을 꽉 채우도록 합니다.
       style={{ flex: 1 }} 
       // 👈 2. 컨텐츠 패딩: 하단 버튼에 메뉴 마지막 아이템이 가려지지 않게 여백을 넉넉히 줍니다.
-      contentContainerStyle={[styles.listContent, { paddingBottom: 100 }]} 
+      contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom }]} 
       focusHook={useEffect} // 바텀시트 내부 포커스 최적화
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
@@ -59,6 +64,7 @@ const ShopMenu = ({ shopId }: Props) => {
         </View>
       }
     />
+    
   );
 };
 
