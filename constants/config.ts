@@ -13,5 +13,9 @@ export const BASE_URL = {
   API_URL: API_BASE_URL,
   ENDPOINTS: {
     SHOPS_LOCATIONS: "/shops/locations",
+    
+    // 🥐 리뷰 관련 엔드포인트
+    REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,
+    REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/reviews/tags`,
   },
 };

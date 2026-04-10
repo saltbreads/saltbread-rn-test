@@ -15,6 +15,7 @@ import ShopHeader from "./ShopHeader";
 import ShopInfoHome from "./ShopInfoHome";
 import ShopMenu from "./ShopMenu";
 import ShopTabs, { ShopTabType } from "./ShopTabs";
+import ShopReview from "./ShopReview";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window"); // 화면 너비 가져오기
 
@@ -61,15 +62,11 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       {/* 3. 탭별 컨텐츠 분기 */}
       {/* 아래 스타일 추후 styles적용 */}
       {/* <View style={{  height:contentHeight}}> */}
-      <View style={{ height:SCREEN_HEIGHT * 0.45 }}>
+      <View style={{ height:SCREEN_HEIGHT * 0.45,overflow: 'hidden', }}>
         {/* <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}> */}
         {activeTab === "홈" && <ShopInfoHome shop={shop} />}
         {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
-        {activeTab === "리뷰" && (
-          <View>
-            <Text>리뷰 리스트 준비 중...</Text>
-          </View>
-        )}
+        {activeTab === "리뷰" && <ShopReview shopId={shop.shopId} />}
         {activeTab === "사진" && (
           <View>
             <Text>전체 사진 그리드 준비 중...</Text>

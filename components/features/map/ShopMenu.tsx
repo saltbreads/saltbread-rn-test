@@ -14,8 +14,8 @@ interface Props {
 const ShopMenu = ({ shopId }: Props) => {
   const { menus, isLoading, getMenus } = useShopMenus(shopId);
   const insets = useSafeAreaInsets();
-  console.log("현재 shopId:", shopId); // 👈 로그 찍어보기
-  console.log("메뉴 데이터 길이:", menus?.length); // 👈 데이터가 오는지 확인
+  // console.log("현재 shopId:", shopId); 
+  // console.log("메뉴 데이터 길이:", menus?.length); 
 
   useEffect(() => {
     getMenus();
