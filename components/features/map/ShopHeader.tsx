@@ -1,59 +1,72 @@
 // components/features/map/ShopHeader.tsx
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, Platform } from 'react-native';
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { Image } from 'expo-image';
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import React from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+// 👈 중요: gorhom이 아닌 gesture-handler에서 직접 가져옵니다.
+import { FlatList } from "react-native-gesture-handler";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-// 사진 한 장의 너비를 결정합니다. (화면 전체 너비 - 양옆 여백)
-const PHOTO_WIDTH = SCREEN_WIDTH - 48; // 부모 패딩(24*2)을 고려한 너비
-const PHOTO_GAP = 16; // 사진 사이의 간격
+const PHOTO_WIDTH = SCREEN_WIDTH - 48;
+const PHOTO_GAP = 16;
 
 interface Props {
   name: string;
   photos: string[];
 }
+const GHFlatList = FlatList as any;
 
 const ShopHeader = ({ name, photos }: Props) => {
   const renderPhotoItem = ({ item }: { item: string }) => (
-    <Image source={{ uri: item }} style={styles.photo} contentFit="cover" transition={300} />
+    <Image
+      source={{ uri: item }}
+      style={styles.photo}
+      contentFit="cover"
+      transition={300}
+    />
   );
 
   return (
     <View style={styles.container}>
       {photos && photos.length > 0 ? (
         <View style={styles.photoSection}>
-        {/* 일반 FlatList 대신 BottomSheetFlatList를 사용하면 
-           바텀시트 내부에서의 스크롤 충돌을 라이브러리가 알아서 처리해줍니다.
-        */}
-        <BottomSheetFlatList
-          data={photos}
-          renderItem={renderPhotoItem}
-          keyExtractor={(item: any) => item}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 24 }}
-          
-          // 👈 자석 효과를 위한 속성들
-          snapToInterval={PHOTO_WIDTH + PHOTO_GAP}
-          snapToAlignment="start"
-          decelerationRate="fast"
-          
-          // 👈 [중요] 시트가 스크롤을 뺏어가지 못하게 방어하는 속성
-          disallowInterruption={true} 
-          extraData={photos}
-        />
-      </View>
+          <GHFlatList // 👈 원본 핸들러용 FlatList 사용
+            data={photos}
+            renderItem={renderPhotoItem}
+            keyExtractor={(item: string, index: number) => `${item}-${index}`}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.photoListContent,
+              // 사진이 한 장일 때는 스크롤 영역이 남지 않도록 조정
+              photos.length === 1 && { width: SCREEN_WIDTH },
+              // @TODO 사진여러장일때 맨마지막 사진 끝까지 스크롤이후 중앙정렬은 안됨
+            ]}
+            // 👈 사진이 2장 이상일 때만 스크롤 활성화
+            scrollEnabled={photos.length > 1}
+            //자석 효과 속성
+            snapToInterval={PHOTO_WIDTH + PHOTO_GAP}
+            snapToAlignment="start"
+            decelerationRate="fast"
+            // 제스쳐보정
+            activeOffsetX={[-10, 10]} // 가로 민감도 극대화
+            failFast={true} // 가로 스크롤 감지 시 즉시 다른 핸들러 취소
+            // 대각선 스크롤 시 바텀시트가 개입하지 못하도록 범위를 좁힘
+            // y축 이동이 5픽셀만 넘어가도 이 핸들러가 가로 전용임을 명시
+            activeOffsetY={[-5, 5]}
+          />
+        </View>
       ) : (
         <View style={styles.noPhotoBox}>
           <Ionicons name="image-outline" size={40} color="#ccc" />
         </View>
       )}
 
+      {/* ... 나머지 타이틀 섹션 ... */}
       <View style={styles.titleSection}>
-        <Text style={styles.title} numberOfLines={1}>{name}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {name}
+        </Text>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>🥐 소금빵 맛집</Text>
         </View>
@@ -64,24 +77,46 @@ const ShopHeader = ({ name, photos }: Props) => {
 
 const styles = StyleSheet.create({
   container: {
+    // 부모인 ShopDetailSheet에서 이미 paddingHorizontal 24를 주고 있으므로
+    // width: SCREEN_WIDTH,
+    // marginBottom: 10,
+  },
+  photoSection: {
     width: SCREEN_WIDTH,
-    marginBottom: 10 },
-  photoSection: { width: SCREEN_WIDTH,marginHorizontal: -24, marginBottom: 16 },
-  photoListContent: { paddingHorizontal: 24 },
-  photo: { width: PHOTO_WIDTH, height: 180, borderRadius: 14, marginRight: PHOTO_GAP },
-  noPhotoBox: { 
-    width: SCREEN_WIDTH - 48, // 부모 패딩을 고려한 너비
-    height: 120, 
-    backgroundColor: '#f5f5f5', 
-    borderRadius: 14, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    marginHorizontal: -24,
     marginBottom: 16,
-    alignSelf: 'center' // 중앙 정렬
+  },
+  photoListContent: { paddingHorizontal: 24 },
+  photo: {
+    width: PHOTO_WIDTH,
+    height: 180,
+    borderRadius: 14,
+    marginRight: PHOTO_GAP,
+  },
+  noPhotoBox: {
+    width: SCREEN_WIDTH - 48, // 부모 패딩을 고려한 너비
+    height: 180,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: PHOTO_GAP,
+    alignSelf: "center", // 중앙 정렬
   },
   titleSection: { marginBottom: 16 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#1A1A1A", marginBottom: 8 },
-  badge: { backgroundColor: "#FFF4E5", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: "flex-start" },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1A1A1A",
+    marginBottom: 8,
+  },
+  badge: {
+    backgroundColor: "#FFF4E5",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
   badgeText: { color: "#FF8C00", fontSize: 13, fontWeight: "700" },
 });
 
