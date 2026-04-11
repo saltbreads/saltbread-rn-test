@@ -60,6 +60,7 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       {/* 2. 탭 바 */}
       <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
+      {/* @TODO 아래 컴포넌트들 리팩토링 및 스타일 정리 현재는 테스트하느라 빼놨습니다 */}
       {/* 3. 탭별 컨텐츠 분기 */}
       {/* 아래 스타일 추후 styles적용 */}
       {/* <View style={{  height:contentHeight}}> */}
