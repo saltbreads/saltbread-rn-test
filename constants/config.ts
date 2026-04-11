@@ -17,5 +17,7 @@ export const BASE_URL = {
     // 🥐 리뷰 관련 엔드포인트
     REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,
     REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/reviews/tags`,
+
+    SHOP_PHOTOS: (shopId: string) => `/shops/${shopId}/photos`,
   },
 };

@@ -16,6 +16,7 @@ import ShopInfoHome from "./ShopInfoHome";
 import ShopMenu from "./ShopMenu";
 import ShopTabs, { ShopTabType } from "./ShopTabs";
 import ShopReview from "./ShopReview";
+import ShopPhotoGrid from "./ShopPhotoGrid";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window"); // 화면 너비 가져오기
 
@@ -67,11 +68,7 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
         {activeTab === "홈" && <ShopInfoHome shop={shop} />}
         {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
         {activeTab === "리뷰" && <ShopReview shopId={shop.shopId} />}
-        {activeTab === "사진" && (
-          <View>
-            <Text>전체 사진 그리드 준비 중...</Text>
-          </View>
-        )}
+        {activeTab === "사진" && <ShopPhotoGrid shopId={shop.shopId} />}
       </View>
 
       {/* 하단 상세정보 버튼 */}
