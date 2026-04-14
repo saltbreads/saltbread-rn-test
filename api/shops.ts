@@ -1,10 +1,12 @@
 // api/shops.ts
 import { BASE_URL } from "@/constants/config";
 
+const { API_URL, ENDPOINTS } = BASE_URL;
+
 export const fetchShopLocations = async () => {
   try {
     const response = await fetch(
-      `${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.SHOPS_LOCATIONS}`
+      `${API_URL}${ENDPOINTS.SHOP_LOCATIONS}`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -19,12 +21,12 @@ export const fetchShopLocations = async () => {
 
 export const fetchShopDetail = async (shopId: string) => {
   try {
-    const response = await fetch(`${BASE_URL.API_URL}/shops/${shopId}/home`);
+    const response = await fetch(`${API_URL}${ENDPOINTS.SHOP_HOME(shopId)}`);
     if (!response.ok) throw new Error("가게 정보를 불러오는데 실패했습니다.");
     
     const json = await response.json();
-    //@TODO 백엔드 shops.controller @Get(':shopId/home') 이부분 오타 수정되면 같이 수정
-    const isSuccessful = json.success || json.sucess;
+    const isSuccessful = json.success
+
     if (isSuccessful && json.data) {
       return json.data; // data 객체만 반환
     }
@@ -37,7 +39,7 @@ export const fetchShopDetail = async (shopId: string) => {
 
 export const fetchShopPhotoHighlights = async (shopId: string) => {
   try {
-    const response = await fetch(`${BASE_URL.API_URL}/shops/${shopId}/photo-highlights`);
+    const response = await fetch(`${API_URL}${ENDPOINTS.SHOP_PHOTO_HIGHLIGHTS(shopId)}`);
     if (!response.ok) throw new Error("사진 하이라이트를 불러오는데 실패했습니다.");
     
     const json = await response.json();
@@ -63,7 +65,7 @@ export const fetchShopPhotoHighlights = async (shopId: string) => {
 
 export const fetchShopMenus = async (shopId: string) => {
   try {
-    const url = `${BASE_URL.API_URL}/shops/${shopId}/menus`;
+    const url = `${API_URL}${ENDPOINTS.SHOP_MENUS(shopId)}`;
     const response = await fetch(url);
     const json = await response.json();
     

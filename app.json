@@ -46,7 +46,8 @@
         {
           "clientKey": "z4af1wsfvj"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
