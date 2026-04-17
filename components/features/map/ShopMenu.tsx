@@ -1,6 +1,6 @@
 // components/features/map/ShopMenu.tsx
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Image } from 'expo-image';
 import { useShopMenus } from '@/hooks/shop/useShopMenus';
