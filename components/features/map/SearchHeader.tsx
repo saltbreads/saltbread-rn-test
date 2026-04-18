@@ -1,26 +1,95 @@
 // components/features/map/SearchHeader.tsx
 
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,Text, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { useSearch } from '@/hooks/shop/useSearch';
 
 export function SearchHeader() {
+  const [text, setText] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
+
+  // 지도의 현재 중심 좌표 (실제로는 Zustand나 Context에서 가져와야 함)
+  const currentLat = 35.8774; 
+  const currentLng = 128.6274;
+
+  // 디바운스 훅 사용
+  const { searchResults, isLoading } = useSearch(text, currentLat, currentLng);
+
+  // 🚀 검색 결과 항목을 그리는 함수
+  const renderSearchItem = ({ item }: { item: any }) => (
+    <TouchableOpacity 
+      style={styles.resultItem} 
+      onPress={() => {
+        // 1. 텍스트 입력창에서 포커스 빼기 (키보드 내리기)
+        setIsFocused(false); 
+        
+        // 2. 입력창 텍스트를 클릭한 가게 이름으로 바꾸기 (선택사항)
+        setText(item.name);
+    
+        // 3. 지도로 좌표 전달 (이 부분은 지도를 컨트롤하는 부모 컴포넌트에 알리거나 
+        //    Zustand 스토어의 center 좌표를 업데이트해야 합니다)
+        // 예: mapStore.setCenter(item.latitude, item.longitude);
+        
+        console.log(`${item.name}으로 지도 이동!`, item.latitude, item.longitude);
+      }}
+    >
+      <Ionicons name="location-outline" size={18} color="#888" />
+      <View style={styles.itemTextContainer}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        {/* 주소 데이터가 있다면 여기에 추가 (현재 JSON엔 없음) */}
+      </View>
+      <Text style={styles.itemRegion}>{item.region === 'daegu' ? '대구' : ''}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
         <Ionicons name="search" size={20} color="#666" />
-        <TextInput placeholder="맛있는 소금빵 검색" style={styles.input} />
+        <TextInput 
+          placeholder="맛있는 소금빵 검색" 
+          style={styles.input} 
+          value={text}
+          onChangeText={setText} // 👈 글자 바뀔 때마다 상태 업데이트
+          onFocus={() => setIsFocused(true)} // 🚀 포커스 시 목록 표시
+          blurOnSubmit={true}
+        />
+
+        {isLoading && <ActivityIndicator size="small" color="#FF6B00" style={{marginRight: 8}} />}
+
         {/* 네이버 지도 스타일의 프로필 아이콘 */}
         <TouchableOpacity onPress={() => router.push('/my-page')}> 
           <Ionicons name="person-circle" size={32} color="#FF6B00" />
         </TouchableOpacity>
       </View>
+
+      {/* 🚀 검색 결과 목록 (드롭다운) */}
+      {isFocused && text.length >= 2 && (
+        <View style={styles.dropdown}>
+          {searchResults.length > 0 ? (
+            <FlatList
+              data={searchResults}
+              renderItem={renderSearchItem}
+              keyExtractor={(item) => item.id}
+              style={styles.list}
+              keyboardShouldPersistTaps="handled" // 목록 클릭 잘 되게
+            />
+          ) : (
+            // 결과가 없을 때
+            !isLoading && (
+              <View style={styles.noResult}>
+                <Text style={styles.noResultText}>검색 결과가 없습니다. 🥐</Text>
+              </View>
+            )
+          )}
+        </View>
+      )}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -44,4 +113,52 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   input: { flex: 1, marginLeft: 8 },
+
+  // 🚀 드롭다운 스타일
+  dropdown: {
+    backgroundColor: 'white',
+    marginTop: 10,
+    borderRadius: 20,
+    maxHeight: 300, // 너무 길어지지 않게
+    overflow: 'hidden',
+    // 그림자
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  list: {
+    paddingVertical: 5,
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#efefef',
+  },
+  itemTextContainer: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  itemName: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  itemRegion: {
+    fontSize: 12,
+    color: '#999',
+    marginLeft: 10,
+  },
+  noResult: {
+    padding: 30,
+    alignItems: 'center',
+  },
+  noResultText: {
+    color: '#999',
+    fontSize: 14,
+  },
 });
