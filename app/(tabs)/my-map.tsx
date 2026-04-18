@@ -1,4 +1,5 @@
 // app/(tabs)/my-map.tsx
+import { SearchHeader } from "@/components/features/map/SearchHeader";
 import ShopDetailSheet from "@/components/features/map/ShopDetailSheet";
 import { useMapControl } from "@/hooks/map/useMapControl";
 import { useShopDetail } from "@/hooks/shop/useShopDetail";
@@ -6,7 +7,6 @@ import { useShops } from "@/hooks/shop/useShops";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useCallback, useMemo, useRef } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import NaverMapViewComponent from "../../components/features/map/NaverMapView";
 
 export default function MyMapScreen() {
@@ -44,20 +44,23 @@ export default function MyMapScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    // <SafeAreaView style={styles.safe} edges={["top"]}>
+    <View style={styles.container}>
       {isListLoading ? (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="#FF8C00" />
         </View>
       ) : (
         <>
+          {/* 3. 상단 검색바 (지도를 덮도록 배치) */}
+          <SearchHeader />
+
           {/* 지도를 그리는 컴포넌트 */}
           <NaverMapViewComponent
             shops={shops}
             onMarkerPress={handleMarkerPress}
             ref={mapRef}
             selectedShopId={selectedShopId}
-            
           />
           <BottomSheet
             ref={bottomSheetRef}
@@ -78,12 +81,14 @@ export default function MyMapScreen() {
           </BottomSheet>
         </>
       )}
-    </SafeAreaView>
+    </View>
+    // </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#fff" },
+  // safe: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#fff" },
   loading: { flex: 1, justifyContent: "center", alignItems: "center" },
   center: {
     flex: 1,
