@@ -21,3 +21,22 @@ export interface ShopPhotosResponse {
   nextCursor: string | null;
   hasNext: boolean;
 }
+
+export interface Shop {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  region: string;
+  heroImageUrl: string | null;
+  avgPrice: number | null;
+  avgRating: number;
+  reviewCount: number;
+  bestLabels: string[];
+}
+
+// API 응답 형태도 정의해두면 더 안전합니다.
+export interface SearchShopsResponse {
+  success: boolean;
+  data: Shop[];
+}

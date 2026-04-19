@@ -20,6 +20,9 @@ export const BASE_URL = {
     SHOP_MENUS: (shopId: string) => `/shops/${shopId}/menus`,
     SHOP_PHOTOS: (shopId: string) => `/shops/${shopId}/photos`,
     SHOP_PHOTO_HIGHLIGHTS: (shopId: string) => `/shops/${shopId}/photo-highlights`,
+
+    // 검색
+    SHOP_SEARCH: "/shops/search",
     
     // 리뷰 관련
     REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,

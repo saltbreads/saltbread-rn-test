@@ -53,7 +53,11 @@ export default function MyMapScreen() {
       ) : (
         <>
           {/* 3. 상단 검색바 (지도를 덮도록 배치) */}
-          <SearchHeader />
+          <SearchHeader
+            onSelectShop={(shop) => {
+              handleMarkerPress(shop);
+            }}
+          />
 
           {/* 지도를 그리는 컴포넌트 */}
           <NaverMapViewComponent
