@@ -1,15 +1,21 @@
 // components/features/map/SearchHeader.tsx
 
-import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,Text, FlatList } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,Text, FlatList,Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearch } from '@/hooks/shop/useSearch';
+import { Shop } from '@/types/shop';
 
-export function SearchHeader() {
+interface SearchHeaderProps {
+  onSelectShop: (shop: Shop) => void;
+}
+
+export function SearchHeader({ onSelectShop }: SearchHeaderProps) {
   const [text, setText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
+  const inputRef = useRef<TextInput>(null);
 
   // 지도의 현재 중심 좌표 (실제로는 Zustand나 Context에서 가져와야 함)
   const currentLat = 35.8774; 
@@ -23,17 +29,25 @@ export function SearchHeader() {
     <TouchableOpacity 
       style={styles.resultItem} 
       onPress={() => {
-        // 1. 텍스트 입력창에서 포커스 빼기 (키보드 내리기)
+        // 키보드 내리기
+        Keyboard.dismiss();
+        
+        // TextInput 커서 포커스 해제 (깜빡이는 커서 없애기)
+        inputRef.current?.blur();
+        
+        // 드롭다운 목록 숨기기
         setIsFocused(false); 
         
-        // 2. 입력창 텍스트를 클릭한 가게 이름으로 바꾸기 (선택사항)
+        // 입력창 텍스트를 클릭한 가게 이름으로 바꾸기
         setText(item.name);
     
         // 3. 지도로 좌표 전달 (이 부분은 지도를 컨트롤하는 부모 컴포넌트에 알리거나 
         //    Zustand 스토어의 center 좌표를 업데이트해야 합니다)
         // 예: mapStore.setCenter(item.latitude, item.longitude);
+        // 부모(my-map.tsx)의 handleMarkerPress 실행
+        onSelectShop(item);
         
-        console.log(`${item.name}으로 지도 이동!`, item.latitude, item.longitude);
+        // console.log(`${item.name}으로 지도 이동!`, item.latitude, item.longitude);
       }}
     >
       <Ionicons name="location-outline" size={18} color="#888" />
@@ -53,9 +67,9 @@ export function SearchHeader() {
           placeholder="맛있는 소금빵 검색" 
           style={styles.input} 
           value={text}
+          ref={inputRef}
           onChangeText={setText} // 👈 글자 바뀔 때마다 상태 업데이트
           onFocus={() => setIsFocused(true)} // 🚀 포커스 시 목록 표시
-          blurOnSubmit={true}
         />
 
         {isLoading && <ActivityIndicator size="small" color="#FF6B00" style={{marginRight: 8}} />}

@@ -1,10 +1,11 @@
 // hooks/shop/useSearch.ts
 
 import { BASE_URL } from '@/constants/config';
+import { Shop } from '@/types/shop';
 import { useState, useEffect } from 'react';
 
 export function useSearch(keyword: string, lat: number, lng: number) {
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Shop[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
