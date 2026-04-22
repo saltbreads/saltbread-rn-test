@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Android local config (SDK 경로 - 개인 PC마다 다름)
+android/local.properties
