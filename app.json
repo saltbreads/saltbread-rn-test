@@ -44,7 +44,7 @@
       [
         "@mj-studio/react-native-naver-map",
         {
-          "clientKey": "z4af1wsfvj"
+          "client_id": "z4af1wsfvj"
         }
       ],
       "expo-secure-store"
