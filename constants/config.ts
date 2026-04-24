@@ -31,5 +31,8 @@ export const BASE_URL = {
     // 인증 관련
     AUTH_GOOGLE: "/auth/google",
     AUTH_EXCHANGE: "/auth/exchange",
+
+    // 유저 관련
+    USERS_ME: "/users/me",
   },
 };
