@@ -55,7 +55,7 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       }}
     >
       {/* 1. 상단 헤더 (사진 + 이름) */}
-      <ShopHeader name={shop.name} photos={photos} />
+      <ShopHeader shopId={shop.shopId} name={shop.name} photos={photos} />
 
       {/* 2. 탭 바 */}
       <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />

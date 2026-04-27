@@ -1,22 +1,46 @@
 // components/features/map/ShopHeader.tsx
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 // 👈 중요: gorhom이 아닌 gesture-handler에서 직접 가져옵니다.
 import { FlatList } from "react-native-gesture-handler";
+import { useAuth } from "@/context/AuthContext";
+import { addFavorite, removeFavorite } from "@/api/favorites";
+import { fetchMyFavorites } from "@/api/users";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PHOTO_WIDTH = SCREEN_WIDTH - 48;
 const PHOTO_GAP = 16;
 
 interface Props {
+  shopId: string;
   name: string;
   photos: string[];
 }
 const GHFlatList = FlatList as any;
 
-const ShopHeader = ({ name, photos }: Props) => {
+const ShopHeader = ({ shopId, name, photos }: Props) => {
+  const { accessToken } = useAuth();
+  const [favorited, setFavorited] = useState(false);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    fetchMyFavorites(accessToken).then((list) => {
+      setFavorited(list.some((s) => s.shopId === shopId));
+    });
+  }, [shopId, accessToken]);
+
+  const handleFavorite = async () => {
+    if (!accessToken) return;
+    const next = !favorited;
+    setFavorited(next);
+    const ok = next
+      ? await addFavorite(shopId, accessToken)
+      : await removeFavorite(shopId, accessToken);
+    if (!ok) setFavorited(!next); // 실패 시 롤백
+  };
+
   const renderPhotoItem = ({ item }: { item: string }) => (
     <Image
       source={{ uri: item }}
@@ -64,9 +88,18 @@ const ShopHeader = ({ name, photos }: Props) => {
 
       {/* ... 나머지 타이틀 섹션 ... */}
       <View style={styles.titleSection}>
-        <Text style={styles.title} numberOfLines={1}>
-          {name}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title} numberOfLines={1}>
+            {name}
+          </Text>
+          <TouchableOpacity onPress={handleFavorite} style={styles.heartButton}>
+            <Ionicons
+              name={favorited ? "heart" : "heart-outline"}
+              size={26}
+              color={favorited ? "#FF4D4D" : "#ccc"}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>🥐 소금빵 맛집</Text>
         </View>
@@ -104,11 +137,18 @@ const styles = StyleSheet.create({
     alignSelf: "center", // 중앙 정렬
   },
   titleSection: { marginBottom: 16 },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  heartButton: { padding: 4 },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#1A1A1A",
-    marginBottom: 8,
+    flex: 1,
   },
   badge: {
     backgroundColor: "#FFF4E5",

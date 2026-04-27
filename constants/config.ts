@@ -34,5 +34,9 @@ export const BASE_URL = {
 
     // 유저 관련
     USERS_ME: "/users/me",
+    USERS_ME_FAVORITES: "/users/me/favorites",
+
+    // 찜하기
+    SHOP_FAVORITE: (shopId: string) => `/shops/${shopId}/favorite`,
   },
 };
