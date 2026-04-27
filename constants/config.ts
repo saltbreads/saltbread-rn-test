@@ -5,7 +5,7 @@
 // const DEV_IP = "10.123.195.158";
 // const API_BASE_URL = `http://${DEV_IP}:4000`;
 
-const API_BASE_URL = "http://10.0.2.2:4000";
+const API_BASE_URL = "https://handball-shelf-crimp.ngrok-free.dev";
 // 안드로이드 에뮬레이터는 10.0.2.2, iOS나 실기기는 localhost 또는 특정 IP
 // const API_BASE_URL =
 //   Platform.OS === "android" ? "http://10.0.2.2:4000" : "http://localhost:4000";
@@ -27,6 +27,7 @@ export const BASE_URL = {
     // 리뷰 관련
     REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,
     REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/reviews/tags`,
+    AI_TAG_SUGGESTIONS: "/reviews/ai-tag-suggestions",
 
     // 인증 관련
     AUTH_GOOGLE: "/auth/google",
@@ -39,4 +40,11 @@ export const BASE_URL = {
     // 찜하기
     SHOP_FAVORITE: (shopId: string) => `/shops/${shopId}/favorite`,
   },
+};
+
+// 클라우디너리 관련
+export const CLOUDINARY_CONFIG = {
+  CLOUD_NAME: "dhfxqpzro",
+  UPLOAD_PRESET: "saltbread_review_upload",
+  FOLDER: "saltbread-map/reviews",
 };
