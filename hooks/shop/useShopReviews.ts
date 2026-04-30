@@ -18,7 +18,7 @@ export const useShopReviews = (shopId: string) => {
       
       // Postman 응답 구조: { success: true, data: { items: [...] } }
       if (response.data.success) {
-        setReviews(response.data.data.items);
+setReviews(response.data.data.items);
         setTotal(response.data.data.total);
       }
     } catch (error) {
