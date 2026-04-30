@@ -5,7 +5,9 @@
 // const DEV_IP = "10.123.195.158";
 // const API_BASE_URL = `http://${DEV_IP}:4000`;
 
-const API_BASE_URL = "https://handball-shelf-crimp.ngrok-free.dev";
+// const API_BASE_URL = "https://handball-shelf-crimp.ngrok-free.dev";
+const API_BASE_URL = "https://uptight-passable-snowshoe.ngrok-free.dev";
+
 // 안드로이드 에뮬레이터는 10.0.2.2, iOS나 실기기는 localhost 또는 특정 IP
 // const API_BASE_URL =
 //   Platform.OS === "android" ? "http://10.0.2.2:4000" : "http://localhost:4000";

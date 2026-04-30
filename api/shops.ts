@@ -20,7 +20,7 @@ export const fetchShopLocations = async () => {
 
     const json = await response.json();
 
-    console.log("[fetchShopLocations] response json:", json);
+    // console.log("[fetchShopLocations] response json:", json);
 
     return json; // { success: true, data: [...] }
   } catch (error) {

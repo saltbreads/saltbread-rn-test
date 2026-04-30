@@ -163,7 +163,7 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
         />
         <View style={styles.authorInfo}>
           <Text style={styles.nickname}>
-            {item.author?.nickname || "익명 사용자"}
+            {item.author?.nickname ?? item.author?.displayName ?? "익명 사용자"}
           </Text>
           <Text style={styles.date}>
             {new Date(item.createdAt).toLocaleDateString()}

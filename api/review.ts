@@ -14,6 +14,7 @@ export type GetShopReviewsParams = {
 export type ReviewAuthorDto = {
   id: string;
   nickname: string | null;
+  displayName: string | null;
   profileImageUrl: string | null;
 } | null;
 

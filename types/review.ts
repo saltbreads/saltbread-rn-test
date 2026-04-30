@@ -2,6 +2,7 @@
 export interface ReviewAuthor {
   id: string;
   nickname: string | null;
+  displayName: string | null;
   profileImageUrl: string | null;
 }
 
