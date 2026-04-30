@@ -5,18 +5,18 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchMyFavorites, FavoriteShop } from '@/api/users';
 
 export default function MyPageScreen() {
-  const { user, accessToken, isLoading } = useAuth();
+  const { user, isLoggedIn, isLoading, authFetch } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
   const [favLoading, setFavLoading] = useState(false);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!isLoggedIn) return;
     setFavLoading(true);
-    fetchMyFavorites(accessToken).then((data) => {
+    fetchMyFavorites(authFetch).then((data) => {
       setFavorites(data);
       setFavLoading(false);
     });
-  }, [accessToken]);
+  }, [isLoggedIn, authFetch]);
 
   if (isLoading) {
     return (

@@ -40,14 +40,17 @@ export default function LoginScreen() {
         `${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.AUTH_EXCHANGE}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Client-Type": "mobile",
+          },
           body: JSON.stringify({ code }),
         }
       );
 
       const result = await response.json();
       if (result.success) {
-        await login(result.data.accessToken);
+        await login(result.data.accessToken, result.data.refreshToken);
         router.replace("/(tabs)/profile");
       } else {
         setLoading(false);

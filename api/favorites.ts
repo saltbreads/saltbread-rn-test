@@ -1,13 +1,13 @@
 // api/favorites.ts
 import { BASE_URL } from "@/constants/config";
+import { AuthFetchFn } from "@/context/AuthContext";
 
 const { API_URL, ENDPOINTS } = BASE_URL;
 
-export const addFavorite = async (shopId: string, accessToken: string): Promise<boolean> => {
+export const addFavorite = async (shopId: string, authFetch: AuthFetchFn): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}${ENDPOINTS.SHOP_FAVORITE(shopId)}`, {
+    const response = await authFetch(`${API_URL}${ENDPOINTS.SHOP_FAVORITE(shopId)}`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${accessToken}` },
     });
     return response.ok;
   } catch (error) {
@@ -16,11 +16,10 @@ export const addFavorite = async (shopId: string, accessToken: string): Promise<
   }
 };
 
-export const removeFavorite = async (shopId: string, accessToken: string): Promise<boolean> => {
+export const removeFavorite = async (shopId: string, authFetch: AuthFetchFn): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}${ENDPOINTS.SHOP_FAVORITE(shopId)}`, {
+    const response = await authFetch(`${API_URL}${ENDPOINTS.SHOP_FAVORITE(shopId)}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${accessToken}` },
     });
     return response.ok;
   } catch (error) {

@@ -1,5 +1,6 @@
 // api/users.ts
 import { BASE_URL } from "@/constants/config";
+import { AuthFetchFn } from "@/context/AuthContext";
 
 const { API_URL, ENDPOINTS } = BASE_URL;
 
@@ -25,9 +26,7 @@ export interface FavoriteShop {
 export const fetchMe = async (accessToken: string): Promise<UserProfile | null> => {
   try {
     const response = await fetch(`${API_URL}${ENDPOINTS.USERS_ME}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!response.ok) throw new Error("유저 정보를 불러오는데 실패했습니다.");
     const json = await response.json();
@@ -39,11 +38,9 @@ export const fetchMe = async (accessToken: string): Promise<UserProfile | null> 
   }
 };
 
-export const fetchMyFavorites = async (accessToken: string): Promise<FavoriteShop[]> => {
+export const fetchMyFavorites = async (authFetch: AuthFetchFn): Promise<FavoriteShop[]> => {
   try {
-    const response = await fetch(`${API_URL}${ENDPOINTS.USERS_ME_FAVORITES}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const response = await authFetch(`${API_URL}${ENDPOINTS.USERS_ME_FAVORITES}`);
     if (!response.ok) throw new Error("찜 목록을 불러오는데 실패했습니다.");
     const json = await response.json();
     if (json.success && json.data) return json.data;
