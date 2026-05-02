@@ -66,7 +66,7 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       {/* <View style={{  height:contentHeight}}> */}
       <View style={{ height:SCREEN_HEIGHT * 0.45,overflow: 'hidden', }}>
         {/* <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}> */}
-        {activeTab === "홈" && <ShopInfoHome shop={shop} />}
+        {activeTab === "홈" && <ShopInfoHome shop={shop} onTabChange={setActiveTab} />}
         {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
         {activeTab === "리뷰" && <ShopReview shopId={shop.shopId} />}
         {activeTab === "사진" && <ShopPhotoGrid shopId={shop.shopId} />}
