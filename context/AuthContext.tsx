@@ -24,55 +24,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // refs로 최신 토큰 값을 유지 (stale closure 방지)
   const accessTokenRef = useRef<string | null>(null);
   const refreshTokenRef = useRef<string | null>(null);
-  // 동시에 여러 401이 와도 refresh 요청은 한 번만
   const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
 
   useEffect(() => { accessTokenRef.current = accessToken; }, [accessToken]);
   useEffect(() => { refreshTokenRef.current = refreshToken; }, [refreshToken]);
 
-  useEffect(() => {
-    const loadToken = async () => {
-      try {
-        const [token, refresh] = await Promise.all([
-          SecureStore.getItemAsync('accessToken'),
-          SecureStore.getItemAsync('refreshToken'),
-        ]);
-        if (token) {
-          setAccessToken(token);
-          accessTokenRef.current = token;
-          if (refresh) {
-            setRefreshToken(refresh);
-            refreshTokenRef.current = refresh;
-          }
-          const profile = await fetchMe(token);
-          setUser(profile);
-        }
-      } catch (e) {
-        console.error('토큰 로딩 에러:', e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadToken();
-  }, []);
-
-  const login = async (token: string, refresh: string) => {
-    await Promise.all([
-      SecureStore.setItemAsync('accessToken', token),
-      SecureStore.setItemAsync('refreshToken', refresh),
-    ]);
-    setAccessToken(token);
-    setRefreshToken(refresh);
-    accessTokenRef.current = token;
-    refreshTokenRef.current = refresh;
-    const profile = await fetchMe(token);
-    setUser(profile);
-  };
-
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await Promise.all([
       SecureStore.deleteItemAsync('accessToken'),
       SecureStore.deleteItemAsync('refreshToken'),
@@ -82,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     accessTokenRef.current = null;
     refreshTokenRef.current = null;
     setUser(null);
-  };
+  }, []);
 
   const doRefresh = useCallback(async (): Promise<string | null> => {
     const currentRefresh = refreshTokenRef.current;
@@ -101,6 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       const json = await response.json();
       if (!response.ok) {
+        // 토큰 갱신 실패 → 로그아웃
         await logout();
         return null;
       }
@@ -116,11 +76,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // 토큰 갱신 성공 → 원래 요청 재시도
       return newAccess;
     } catch {
-      // 토큰 갱신 실패 → 로그아웃
       await logout();
       return null;
     }
-  }, []);
+  }, [logout]);
 
   const authFetch = useCallback<AuthFetchFn>(async (input, init) => {
     const makeRequest = (token: string | null) =>
@@ -146,6 +105,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return makeRequest(newToken);
   }, [doRefresh]);
+
+  useEffect(() => {
+    const loadToken = async () => {
+      try {
+        const [token, refresh] = await Promise.all([
+          SecureStore.getItemAsync('accessToken'),
+          SecureStore.getItemAsync('refreshToken'),
+        ]);
+        if (token) {
+          setAccessToken(token);
+          accessTokenRef.current = token;
+          if (refresh) {
+            setRefreshToken(refresh);
+            refreshTokenRef.current = refresh;
+          }
+          // authFetch 사용 → 토큰 만료 시 자동 갱신 후 유저 정보 로드
+          const response = await authFetch(`${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.USERS_ME}`);
+          if (response.ok) {
+            const json = await response.json();
+            if (json.success && json.data) setUser(json.data);
+          }
+        }
+      } catch (e) {
+        console.error('토큰 로딩 에러:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadToken();
+  }, [authFetch]);
+
+  const login = async (token: string, refresh: string) => {
+    await Promise.all([
+      SecureStore.setItemAsync('accessToken', token),
+      SecureStore.setItemAsync('refreshToken', refresh),
+    ]);
+    setAccessToken(token);
+    setRefreshToken(refresh);
+    accessTokenRef.current = token;
+    refreshTokenRef.current = refresh;
+    const profile = await fetchMe(token);
+    setUser(profile);
+  };
 
   return (
     <AuthContext.Provider value={{ accessToken, user, isLoggedIn: !!accessToken, isLoading, login, logout, authFetch }}>
