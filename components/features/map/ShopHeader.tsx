@@ -21,23 +21,23 @@ interface Props {
 const GHFlatList = FlatList as any;
 
 const ShopHeader = ({ shopId, name, photos }: Props) => {
-  const { accessToken } = useAuth();
+  const { isLoggedIn, authFetch } = useAuth();
   const [favorited, setFavorited] = useState(false);
 
   useEffect(() => {
-    if (!accessToken) return;
-    fetchMyFavorites(accessToken).then((list) => {
+    if (!isLoggedIn) return;
+    fetchMyFavorites(authFetch).then((list) => {
       setFavorited(list.some((s) => s.shopId === shopId));
     });
-  }, [shopId, accessToken]);
+  }, [shopId, isLoggedIn, authFetch]);
 
   const handleFavorite = async () => {
-    if (!accessToken) return;
+    if (!isLoggedIn) return;
     const next = !favorited;
     setFavorited(next);
     const ok = next
-      ? await addFavorite(shopId, accessToken)
-      : await removeFavorite(shopId, accessToken);
+      ? await addFavorite(shopId, authFetch)
+      : await removeFavorite(shopId, authFetch);
     if (!ok) setFavorited(!next); // 실패 시 롤백
   };
 
