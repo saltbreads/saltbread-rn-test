@@ -28,7 +28,7 @@ export const BASE_URL = {
 
     // 리뷰 관련
     REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,
-    REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/reviews/tags`,
+    REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/review-tags`,
     AI_TAG_SUGGESTIONS: "/reviews/ai-tag-suggestions",
 
     // 인증 관련
@@ -39,6 +39,7 @@ export const BASE_URL = {
     // 유저 관련
     USERS_ME: "/users/me",
     USERS_ME_FAVORITES: "/users/me/favorites",
+    USERS_ME_REVIEWS: "/users/me/reviews",
 
     // 찜하기
     SHOP_FAVORITE: (shopId: string) => `/shops/${shopId}/favorite`,

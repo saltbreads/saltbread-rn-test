@@ -1,20 +1,26 @@
 // app/my-page/index.tsx
 import { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
-import { fetchMyFavorites, FavoriteShop } from '@/api/users';
+import { fetchMyFavorites, fetchMyReviews, FavoriteShop, MyReview } from '@/api/users';
 
 export default function MyPageScreen() {
   const { user, isLoggedIn, isLoading, authFetch } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
-  const [favLoading, setFavLoading] = useState(false);
+  const [reviews, setReviews] = useState<MyReview[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    setFavLoading(true);
-    fetchMyFavorites(authFetch).then((data) => {
-      setFavorites(data);
-      setFavLoading(false);
+    setDataLoading(true);
+    Promise.all([
+      fetchMyFavorites(authFetch),
+      fetchMyReviews(authFetch),
+    ]).then(([favData, reviewData]) => {
+      setFavorites(favData);
+      setReviews(reviewData?.items ?? []);
+      setDataLoading(false);
     });
   }, [isLoggedIn, authFetch]);
 
@@ -35,7 +41,7 @@ export default function MyPageScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* 프로필 영역 */}
       <View style={styles.profileSection}>
         {user.profileImageUrl ? (
@@ -52,40 +58,90 @@ export default function MyPageScreen() {
         <Text style={styles.provider}>{user.provider} 계정으로 로그인</Text>
       </View>
 
-      {/* 찜 카운트 */}
+      {/* 통계 */}
       <View style={styles.statRow}>
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{favorites.length}</Text>
           <Text style={styles.statLabel}>찜한 가게</Text>
         </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statBox}>
+          <View style={styles.reviewStatRow}>
+            <Text style={styles.statNumber}>{reviews.length}</Text>
+            {user.avgRating != null && (
+              <Text style={styles.avgRating}>( ⭐{user.avgRating.toFixed(1)} )</Text>
+            )}
+          </View>
+          <Text style={styles.statLabel}>작성한 리뷰</Text>
+        </View>
       </View>
 
-      {/* 찜한 가게 목록 */}
-      <Text style={styles.sectionTitle}>찜한 가게</Text>
-      {favLoading ? (
-        <ActivityIndicator style={{ marginTop: 16 }} color="#C8A97E" />
-      ) : favorites.length === 0 ? (
-        <Text style={styles.emptyText}>아직 찜한 가게가 없어요.</Text>
+      {dataLoading ? (
+        <ActivityIndicator style={{ marginTop: 32 }} color="#C8A97E" />
       ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.shopId}
-          renderItem={({ item }) => (
-            <View style={styles.favoriteItem}>
-              {item.heroImageUrl ? (
-                <Image source={{ uri: item.heroImageUrl }} style={styles.shopImage} />
-              ) : (
-                <View style={[styles.shopImage, styles.shopImageFallback]} />
-              )}
-              <View style={styles.shopInfo}>
-                <Text style={styles.shopName}>{item.name}</Text>
-                <Text style={styles.shopRegion}>{item.region}</Text>
+        <>
+          {/* 찜한 가게 */}
+          <Text style={styles.sectionTitle}>찜한 가게</Text>
+          {favorites.length === 0 ? (
+            <Text style={styles.emptyText}>아직 찜한 가게가 없어요.</Text>
+          ) : (
+            favorites.map((item) => (
+              <View key={item.shopId} style={styles.favoriteItem}>
+                {item.heroImageUrl ? (
+                  <Image source={{ uri: item.heroImageUrl }} style={styles.shopImage} />
+                ) : (
+                  <View style={[styles.shopImage, styles.shopImageFallback]} />
+                )}
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={styles.itemSub}>{item.region}</Text>
+                </View>
               </View>
-            </View>
+            ))
           )}
-        />
+
+          {/* 내 리뷰 */}
+          <Text style={styles.sectionTitle}>작성한 리뷰</Text>
+          {reviews.length === 0 ? (
+            <Text style={styles.emptyText}>아직 작성한 리뷰가 없어요.</Text>
+          ) : (
+            reviews.map((item) => (
+              <View key={item.id} style={styles.reviewItem}>
+                {item.shop.heroImageUrl ? (
+                  <Image source={{ uri: item.shop.heroImageUrl }} style={styles.shopImage} />
+                ) : (
+                  <View style={[styles.shopImage, styles.shopImageFallback]} />
+                )}
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{item.shop.name}</Text>
+                  <View style={styles.ratingRow}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Ionicons
+                        key={i}
+                        name={i < item.rating ? 'star' : 'star-outline'}
+                        size={12}
+                        color="#FF8C00"
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.reviewContent} numberOfLines={2}>{item.content}</Text>
+                  {item.tags.length > 0 && (
+                    <View style={styles.tagRow}>
+                      {item.tags.map((tag) => (
+                        <View key={tag} style={styles.tag}>
+                          <Text style={styles.tagText}>{tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+            ))
+          )}
+          <View style={{ height: 32 }} />
+        </>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -99,16 +155,25 @@ const styles = StyleSheet.create({
   name: { fontSize: 20, fontWeight: 'bold' },
   email: { fontSize: 13, color: '#888' },
   provider: { fontSize: 12, color: '#aaa' },
-  statRow: { flexDirection: 'row', justifyContent: 'center', paddingVertical: 16, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
-  statBox: { alignItems: 'center', paddingHorizontal: 32 },
+  statRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
+  statBox: { alignItems: 'center', paddingHorizontal: 40 },
+  statDivider: { width: 1, height: 32, backgroundColor: '#f0f0f0' },
   statNumber: { fontSize: 22, fontWeight: 'bold', color: '#FF8C00' },
   statLabel: { fontSize: 12, color: '#888', marginTop: 2 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 },
+  reviewStatRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4 },
+  avgRating: { fontSize: 22, color: '#FF8C00', fontWeight: 'bold' },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', paddingHorizontal: 20, paddingTop: 24, paddingBottom: 10 },
   favoriteItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, gap: 14 },
+  reviewItem: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 20, paddingVertical: 12, gap: 14 },
   shopImage: { width: 56, height: 56, borderRadius: 10 },
   shopImageFallback: { backgroundColor: '#f0f0f0' },
-  shopInfo: { flex: 1 },
-  shopName: { fontSize: 15, fontWeight: '600' },
-  shopRegion: { fontSize: 13, color: '#888', marginTop: 2 },
-  emptyText: { textAlign: 'center', color: '#aaa', marginTop: 16, fontSize: 14 },
+  itemInfo: { flex: 1 },
+  itemName: { fontSize: 15, fontWeight: '600' },
+  itemSub: { fontSize: 13, color: '#888', marginTop: 2 },
+  ratingRow: { flexDirection: 'row', gap: 2, marginTop: 3 },
+  reviewContent: { fontSize: 13, color: '#555', marginTop: 4, lineHeight: 18 },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
+  tag: { backgroundColor: '#FFF4E5', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
+  tagText: { fontSize: 11, color: '#FF8C00' },
+  emptyText: { textAlign: 'center', color: '#aaa', marginTop: 8, fontSize: 14, paddingHorizontal: 20 },
 });
