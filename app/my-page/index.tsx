@@ -37,7 +37,7 @@ export default function MyPageScreen() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#C8A97E" />
+        <ActivityIndicator size="large" color="#FF8C00" />
       </View>
     );
   }
@@ -106,7 +106,7 @@ export default function MyPageScreen() {
     return (
       <View style={styles.container}>
         <ProfileHeader />
-        <ActivityIndicator style={{ marginTop: 48 }} color="#C8A97E" />
+        <ActivityIndicator style={{ marginTop: 48 }} color="#FF8C00" />
       </View>
     );
   }
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
 
   profileSection: { alignItems: 'center', paddingBottom: 24, gap: 6 },
   avatar: { width: 80, height: 80, borderRadius: 40, marginBottom: 8 },
-  avatarFallback: { backgroundColor: '#C8A97E', alignItems: 'center', justifyContent: 'center' },
+  avatarFallback: { backgroundColor: '#FF8C00', alignItems: 'center', justifyContent: 'center' },
   avatarInitial: { fontSize: 32, color: '#fff', fontWeight: 'bold' },
   name: { fontSize: 20, fontWeight: 'bold' },
   email: { fontSize: 13, color: '#888' },

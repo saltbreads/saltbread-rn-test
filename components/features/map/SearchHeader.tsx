@@ -19,9 +19,10 @@ import {
 
 interface SearchHeaderProps {
   onSelectShop: (shop: Shop) => void;
+  mapLoading?: boolean;
 }
 
-export function SearchHeader({ onSelectShop }: SearchHeaderProps) {
+export function SearchHeader({ onSelectShop, mapLoading = false }: SearchHeaderProps) {
   const [text, setText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
@@ -103,10 +104,13 @@ export function SearchHeader({ onSelectShop }: SearchHeaderProps) {
           />
         )}
 
-        {/* 네이버 지도 스타일의 프로필 아이콘 */}
-        <TouchableOpacity onPress={() => router.push("/my-page")}>
-          <Ionicons name="person-circle" size={32} color="#FF6B00" />
-        </TouchableOpacity>
+        {mapLoading ? (
+          <ActivityIndicator size="small" color="#FF6B00" style={{ width: 32, height: 32 }} />
+        ) : (
+          <TouchableOpacity onPress={() => router.push("/my-page")}>
+            <Ionicons name="person-circle" size={32} color="#FF6B00" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* 🚀 검색 결과 목록 (드롭다운) */}
