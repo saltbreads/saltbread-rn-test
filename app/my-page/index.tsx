@@ -3,14 +3,18 @@ import { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { fetchMyFavorites, fetchMyReviews, FavoriteShop, MyReview } from '@/api/users';
 import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
+import { useMapStore } from '@/store/useMapStore';
 
 type TabType = 'favorites' | 'reviews';
 
 export default function MyPageScreen() {
   const { user, isLoggedIn, isLoading, authFetch } = useAuth();
+  const router = useRouter();
+  const { setPendingShopId } = useMapStore();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabType>('favorites');
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
@@ -115,16 +119,27 @@ export default function MyPageScreen() {
           keyExtractor={(item) => item.shopId}
           ListHeaderComponent={<ProfileHeader />}
           renderItem={({ item }) => (
-            <View style={styles.row}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => {
+                setPendingShopId(item.shopId);
+                router.push('/(tabs)/my-map');
+              }}
+            >
               {item.heroImageUrl
                 ? <Image source={{ uri: item.heroImageUrl }} style={styles.shopImage} />
                 : <View style={[styles.shopImage, styles.shopImageFallback]} />
               }
               <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemSub}>{item.region}</Text>
+                <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.shopStats}>
+                  {'💬'} {item.reviewCount}{item.avgRating != null ? `  ⭐${item.avgRating.toFixed(1)}` : ''}
+                </Text>
+                {item.roadAddress && (
+                  <Text style={styles.itemSub} numberOfLines={1}>{item.roadAddress}</Text>
+                )}
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           ListEmptyComponent={<Text style={styles.emptyText}>아직 찜한 가게가 없어요.</Text>}
           contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
@@ -200,7 +215,8 @@ const styles = StyleSheet.create({
   shopImageFallback: { backgroundColor: '#f0f0f0' },
   itemInfo: { flex: 1 },
   itemName: { fontSize: 15, fontWeight: '600' },
-  itemSub: { fontSize: 13, color: '#888', marginTop: 2 },
+  shopStats: { fontSize: 13, color: '#888', marginTop: 2 },
+  itemSub: { fontSize: 13, color: '#aaa', marginTop: 2 },
   ratingRow: { flexDirection: 'row', gap: 2, marginTop: 3 },
   reviewContent: { fontSize: 13, color: '#555', marginTop: 4, lineHeight: 18 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
