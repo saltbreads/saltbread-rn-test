@@ -28,6 +28,7 @@ export default function RootLayout() {
         >
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="my-page/index" options={{ headerShown: false }} />
             {/* 로그인 화면(WebView)을 위한 스택 추가 */}
             <Stack.Screen
               name="(auth)/login"
