@@ -23,6 +23,9 @@ export interface FavoriteShop {
   name: string;
   heroImageUrl: string;
   region: string;
+  roadAddress: string | null;
+  avgRating: number | null;
+  reviewCount: number;
   createdAt: string;
 }
 
