@@ -1,6 +1,8 @@
 // app/(auth)/login.tsx
 import { AUTH_CONFIG } from "@/constants/auth";
 import { BASE_URL } from "@/constants/config";
+import { ROUTES } from "@/constants/routes";
+import { AppColors } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext"; // @ 경로 사용 권장
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -20,7 +22,7 @@ export default function LoginScreen() {
   // 로딩 뷰를 공통 컴포넌트로 분리해서 재사용
   const LoadingView = ({ text }: { text: string }) => (
     <View style={styles.loadingOverlay}>
-      <ActivityIndicator size="large" color="#FF6B00" />
+      <ActivityIndicator size="large" color={AppColors.primaryAlt} />
       <Text style={styles.loadingText}>{text}</Text>
     </View>
   );
@@ -51,7 +53,7 @@ export default function LoginScreen() {
       const result = await response.json();
       if (result.success) {
         await login(result.data.accessToken, result.data.refreshToken);
-        router.replace("/(tabs)/profile");
+        router.replace(ROUTES.PROFILE);
       } else {
         setLoading(false);
         isProcessing.current = false;
@@ -68,7 +70,7 @@ export default function LoginScreen() {
       {/* 1. 웹뷰가 로딩 중이거나 백엔드와 통신 중일 때 보여줄 로딩 창 */}
       {loading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#FF6B00" />
+          <ActivityIndicator size="large" color={AppColors.primaryAlt} />
           <LoadingView text="로그인 정보를 확인 중입니다... 🥐" />
         </View>
       )}
@@ -81,7 +83,7 @@ export default function LoginScreen() {
         startInLoadingState={true}
         renderLoading={() => (
           <View style={{ flex: 1 }}>
-            <ActivityIndicator size="large" color="#FF6B00" />
+            <ActivityIndicator size="large" color={AppColors.primaryAlt} />
             <Text style={styles.loadingText}>소금빵 굽는 중... (로그인 창 불러오기)</Text>
           </View>
         )}

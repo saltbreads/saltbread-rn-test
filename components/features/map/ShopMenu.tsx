@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import { useShopMenus } from '@/hooks/shop/useShopMenus';
 import { ShopMenuData } from '@/types/shop'; 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AppColors } from '@/constants/theme';
 
 interface Props {
   shopId: string;
@@ -21,7 +22,7 @@ const ShopMenu = ({ shopId }: Props) => {
     getMenus();
   }, [getMenus]);
 
-  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color="#FF8C00" />;
+  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
 
   const renderMenuItem = ({ item }: { item: ShopMenuData }) => (
     <View style={styles.menuItem}>
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   },
   menuTextContent: { flex: 1, paddingRight: 12 },
   menuName: { fontSize: 16, fontWeight: '600', color: '#1A1A1A', marginBottom: 4 },
-  menuPrice: { fontSize: 15, fontWeight: '700', color: '#FF8C00' },
+  menuPrice: { fontSize: 15, fontWeight: '700', color: AppColors.primary },
   menuImage: { width: 64, height: 64, borderRadius: 10, backgroundColor: '#f9f9f9' },
   noImage: { 
     width: 64, 

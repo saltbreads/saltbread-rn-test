@@ -1,9 +1,12 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
+
+// 앱 브랜드 컬러
+export const AppColors = {
+  primary: '#FF8C00',       // 주 오렌지 (버튼, 아이콘, 강조)
+  primaryAlt: '#FF6B00',    // 검색바 오렌지 (SearchHeader)
+  primaryBg: '#FFF4E5',     // 연한 오렌지 배경 (태그, 뱃지)
+  primaryBgStrong: '#FFE0B2', // 진한 오렌지 배경 (상위 태그)
+} as const;
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';

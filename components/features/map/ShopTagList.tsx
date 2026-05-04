@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { fetchShopReviewTags } from '@/api/review';
 import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
+import { AppColors } from '@/constants/theme';
 
 const INITIAL_SHOW = 5;
 
@@ -59,22 +60,22 @@ const styles = StyleSheet.create({
   tagRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF4E5',
+    backgroundColor: AppColors.primaryBg,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 6,
   },
   tagRowTop: {
-    backgroundColor: '#FFE0B2',
+    backgroundColor: AppColors.primaryBgStrong,
   },
   emoji: { fontSize: 22, marginRight: 12 },
   label: { flex: 1, fontSize: 14, fontWeight: '600', color: '#CC6600' },
   labelTop: { color: '#BF4F00' },
-  count: { fontSize: 16, fontWeight: 'bold', color: '#FF8C00' },
+  count: { fontSize: 16, fontWeight: 'bold', color: AppColors.primary },
   countTop: { color: '#E65C00' },
   moreRow: { alignItems: 'flex-end', marginTop: 2 },
-  moreText: { fontSize: 12, color: '#FF8C00' },
+  moreText: { fontSize: 12, color: AppColors.primary },
 });
 
 export default ShopTagList;

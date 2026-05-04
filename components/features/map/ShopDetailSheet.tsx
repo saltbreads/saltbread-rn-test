@@ -14,7 +14,9 @@ import {
 import ShopHeader from "./ShopHeader";
 import ShopInfoHome from "./ShopInfoHome";
 import ShopMenu from "./ShopMenu";
-import ShopTabs, { ShopTabType } from "./ShopTabs";
+import ShopTabs from "./ShopTabs";
+import { ShopTabType, SHOP_TAB } from "@/constants/tabs";
+import { AppColors } from "@/constants/theme";
 import ShopReview from "./ShopReview";
 import ShopPhotoGrid from "./ShopPhotoGrid";
 
@@ -27,13 +29,13 @@ interface Props {
 }
 
 const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
-  const [activeTab, setActiveTab] = useState<ShopTabType>("홈");
+  const [activeTab, setActiveTab] = useState<ShopTabType>(SHOP_TAB.HOME);
   const [contentHeight, setContentHeight] = useState(400);
 
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="small" color="#FF8C00" />
+        <ActivityIndicator size="small" color={AppColors.primary} />
         <Text style={styles.loadingText}>정보를 가져오는 중...</Text>
       </View>
     );
@@ -66,10 +68,10 @@ const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
       {/* <View style={{  height:contentHeight}}> */}
       <View style={{ height:SCREEN_HEIGHT * 0.45,overflow: 'hidden', }}>
         {/* <View style={{ flex: 1,minHeight:300, overflow: 'hidden' }}> */}
-        {activeTab === "홈" && <ShopInfoHome shop={shop} onTabChange={setActiveTab} />}
-        {activeTab === "메뉴" && <ShopMenu shopId={shop.shopId} />}
-        {activeTab === "리뷰" && <ShopReview shopId={shop.shopId} />}
-        {activeTab === "사진" && <ShopPhotoGrid shopId={shop.shopId} />}
+        {activeTab === SHOP_TAB.HOME && <ShopInfoHome shop={shop} onTabChange={setActiveTab} />}
+        {activeTab === SHOP_TAB.MENU && <ShopMenu shopId={shop.shopId} />}
+        {activeTab === SHOP_TAB.REVIEW && <ShopReview shopId={shop.shopId} />}
+        {activeTab === SHOP_TAB.PHOTO && <ShopPhotoGrid shopId={shop.shopId} />}
       </View>
 
       {/* 하단 상세정보 버튼 */}
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: "flex-start",
   },
-  badgeText: { color: "#FF8C00", fontSize: 13, fontWeight: "700" },
+  badgeText: { color: AppColors.primary, fontSize: 13, fontWeight: "700" },
   infoSection: { marginBottom: 30 },
   item: {
     flexDirection: "row",
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   mainButton: {
-    backgroundColor: "#FF8C00",
+    backgroundColor: AppColors.primary,
     flexDirection: "row",
     paddingVertical: 16,
     borderRadius: 14,

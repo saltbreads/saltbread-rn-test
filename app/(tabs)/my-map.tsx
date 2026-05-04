@@ -10,6 +10,7 @@ import React, { useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import NaverMapViewComponent from "../../components/features/map/NaverMapView";
 import { useMapStore } from "@/store/useMapStore";
+import { AppColors } from "@/constants/theme";
 
 export default function MyMapScreen() {
   //useShops - 가게 x,y 정보 fetch하는 훅
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  badgeText: { color: "#FF8C00", fontWeight: "600", fontSize: 13 },
+  badgeText: { color: AppColors.primary, fontWeight: "600", fontSize: 13 },
   detailList: { marginBottom: 24 },
   detailItem: {
     flexDirection: "row",
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
   },
   linkText: { color: "#007AFF", textDecorationLine: "underline" },
   mainButton: {
-    backgroundColor: "#FF8C00",
+    backgroundColor: AppColors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

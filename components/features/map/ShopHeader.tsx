@@ -8,6 +8,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { useAuth } from "@/context/AuthContext";
 import { addFavorite, removeFavorite } from "@/api/favorites";
 import { fetchMyFavorites } from "@/api/users";
+import { AppColors } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PHOTO_WIDTH = SCREEN_WIDTH - 48;
@@ -151,13 +152,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   badge: {
-    backgroundColor: "#FFF4E5",
+    backgroundColor: AppColors.primaryBg,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
     alignSelf: "flex-start",
   },
-  badgeText: { color: "#FF8C00", fontSize: 13, fontWeight: "700" },
+  badgeText: { color: AppColors.primary, fontSize: 13, fontWeight: "700" },
 });
 
 export default ShopHeader;

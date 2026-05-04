@@ -1,6 +1,8 @@
 // components/features/map/SearchHeader.tsx
 
 import { useSearch } from "@/hooks/shop/useSearch";
+import { ROUTES } from "@/constants/routes";
+import { AppColors } from "@/constants/theme";
 import { Shop } from "@/types/shop";
 import { getDistanceKm, formatDistance} from "@/utils/distance";
 import { Ionicons } from "@expo/vector-icons";
@@ -99,16 +101,16 @@ export function SearchHeader({ onSelectShop, mapLoading = false }: SearchHeaderP
         {isLoading && (
           <ActivityIndicator
             size="small"
-            color="#FF6B00"
+            color={AppColors.primaryAlt}
             style={{ marginRight: 8 }}
           />
         )}
 
         {mapLoading ? (
-          <ActivityIndicator size="small" color="#FF6B00" style={{ width: 32, height: 32 }} />
+          <ActivityIndicator size="small" color={AppColors.primaryAlt} style={{ width: 32, height: 32 }} />
         ) : (
-          <TouchableOpacity onPress={() => router.push("/my-page")}>
-            <Ionicons name="person-circle" size={32} color="#FF6B00" />
+          <TouchableOpacity onPress={() => router.push(ROUTES.MY_PAGE)}>
+            <Ionicons name="person-circle" size={32} color={AppColors.primaryAlt} />
           </TouchableOpacity>
         )}
       </View>
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
   // 거리 스타일
   itemDistance: {
     fontSize: 13,
-    color: '#FF6B00',
+    color: AppColors.primaryAlt,
     marginTop: 2,
     fontWeight: '600',
   },

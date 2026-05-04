@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReviewStore } from '@/store/useReviewStore';
 import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
 import { MyReview } from '@/api/users';
+import { AppColors } from '@/constants/theme';
 
 export default function ReviewDetailScreen() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function ReviewDetailScreen() {
       {/* 별점 */}
       <View style={styles.ratingRow}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <Ionicons key={i} name={i < item.rating ? 'star' : 'star-outline'} size={16} color="#FF8C00" />
+          <Ionicons key={i} name={i < item.rating ? 'star' : 'star-outline'} size={16} color={AppColors.primary} />
         ))}
         <Text style={styles.ratingText}>{item.rating}.0</Text>
       </View>
@@ -108,13 +109,13 @@ const styles = StyleSheet.create({
   shopAddress: { fontSize: 12, color: '#888', marginTop: 2 },
 
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginBottom: 8 },
-  ratingText: { fontSize: 13, color: '#FF8C00', fontWeight: '600', marginLeft: 4 },
+  ratingText: { fontSize: 13, color: AppColors.primary, fontWeight: '600', marginLeft: 4 },
 
   content: { fontSize: 14, color: '#333', lineHeight: 20, marginBottom: 10 },
 
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
-  tag: { backgroundColor: '#FFF4E5', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
-  tagText: { fontSize: 12, color: '#FF8C00' },
+  tag: { backgroundColor: AppColors.primaryBg, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  tagText: { fontSize: 12, color: AppColors.primary },
 
   imageRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   reviewImage: { width: 90, height: 90, borderRadius: 8 },

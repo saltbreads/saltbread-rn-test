@@ -1,6 +1,7 @@
 // components/features/map/MapMarker.tsx
 import React from 'react';
 import { NaverMapMarkerOverlay } from '@mj-studio/react-native-naver-map';
+import { AppColors } from '@/constants/theme';
 
 interface MapMarkerProps {
   shop: any; // 가게 전체 데이터를 받음
@@ -19,7 +20,7 @@ const MapMarker = ({ shop, onPress,isSelected }: MapMarkerProps) => {
         text: shop.name,
         textSize: 12,
         // 선택되었을 때 텍스트 색상을 오렌지로 변경
-        color: isSelected ? '#FF8C00' : '#333',
+        color: isSelected ? AppColors.primary : '#333',
         haloColor: '#fff',
       }}
       // 로컬 이미지를 넣을 때는 'image' prop을 사용합니다.
