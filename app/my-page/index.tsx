@@ -1,13 +1,17 @@
 // app/my-page/index.tsx
 import { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { fetchMyFavorites, fetchMyReviews, FavoriteShop, MyReview } from '@/api/users';
-import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
 import { useMapStore } from '@/store/useMapStore';
+import { useReviewStore } from '@/store/useReviewStore';
+
+const GRID_COL = 2;
+const GRID_PADDING = 12;
+const GRID_GAP = 6;
+const GRID_ITEM_SIZE = (Dimensions.get('window').width - GRID_PADDING * 2 - GRID_GAP) / GRID_COL;
 
 type TabType = 'favorites' | 'reviews';
 
@@ -15,6 +19,7 @@ export default function MyPageScreen() {
   const { user, isLoggedIn, isLoading, authFetch } = useAuth();
   const router = useRouter();
   const { setPendingShopId } = useMapStore();
+  const { setReviewDetail } = useReviewStore();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabType>('favorites');
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
@@ -115,6 +120,7 @@ export default function MyPageScreen() {
     return (
       <View style={styles.container}>
         <FlatList
+          key="favorites"
           data={favorites}
           keyExtractor={(item) => item.shopId}
           ListHeaderComponent={<ProfileHeader />}
@@ -151,35 +157,35 @@ export default function MyPageScreen() {
   return (
     <View style={styles.container}>
       <FlatList
+        key="reviews"
         data={reviews}
         keyExtractor={(item) => item.id}
+        numColumns={2}
         ListHeaderComponent={<ProfileHeader />}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            {item.shop.heroImageUrl
-              ? <Image source={{ uri: item.shop.heroImageUrl }} style={styles.shopImage} />
-              : <View style={[styles.shopImage, styles.shopImageFallback]} />
-            }
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{item.shop.name}</Text>
-              <View style={styles.ratingRow}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Ionicons key={i} name={i < item.rating ? 'star' : 'star-outline'} size={12} color="#FF8C00" />
-                ))}
+        columnWrapperStyle={{ gap: GRID_GAP, paddingHorizontal: GRID_PADDING }}
+        renderItem={({ item, index }) => {
+          const imgUri = item.images[0]?.url ?? item.shop.heroImageUrl;
+          const region = item.shop.roadAddress?.split(' ').slice(0, 3).join(' ') ?? '';
+          return (
+            <TouchableOpacity
+              style={styles.gridItem}
+              activeOpacity={0.85}
+              onPress={() => {
+                setReviewDetail(reviews, index);
+                router.push('/my-page/review' as any);
+              }}
+            >
+              {imgUri
+                ? <Image source={{ uri: imgUri }} style={styles.gridImage} />
+                : <View style={[styles.gridImage, styles.gridImageFallback]} />
+              }
+              <View style={styles.gridOverlay}>
+                <Text style={styles.gridRegion} numberOfLines={1}>{region}</Text>
+                <Text style={styles.gridShopName} numberOfLines={1}>{item.shop.name}</Text>
               </View>
-              <Text style={styles.reviewContent} numberOfLines={2}>{item.content}</Text>
-              {item.tags.length > 0 && (
-                <View style={styles.tagRow}>
-                  {item.tags.map((tag) => (
-                    <View key={tag} style={styles.tag}>
-                      <Text style={styles.tagText}>{REVIEW_TAG_EMOJI[tag] ?? '🏷️'} {tag}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          </View>
-        )}
+            </TouchableOpacity>
+          );
+        }}
         ListEmptyComponent={<Text style={styles.emptyText}>아직 작성한 리뷰가 없어요.</Text>}
         contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
       />
@@ -223,4 +229,15 @@ const styles = StyleSheet.create({
   tag: { backgroundColor: '#FFF4E5', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   tagText: { fontSize: 11, color: '#FF8C00' },
   emptyText: { textAlign: 'center', color: '#aaa', marginTop: 32, fontSize: 14 },
+
+  gridItem: { width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE, marginBottom: GRID_GAP, borderRadius: 10, overflow: 'hidden' },
+  gridImage: { width: '100%', height: '100%' },
+  gridImageFallback: { backgroundColor: '#f0f0f0' },
+  gridOverlay: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    paddingHorizontal: 8, paddingVertical: 6,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  gridRegion: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
+  gridShopName: { fontSize: 13, color: '#fff', fontWeight: 'bold', marginTop: 1 },
 });
