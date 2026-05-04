@@ -7,13 +7,16 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchMyFavorites, fetchMyReviews, FavoriteShop, MyReview } from '@/api/users';
 import { useMapStore } from '@/store/useMapStore';
 import { useReviewStore } from '@/store/useReviewStore';
+import { ROUTES } from '@/constants/routes';
+import { AppColors } from '@/constants/theme';
+import { MY_PAGE_TAB, MyPageTabType } from '@/constants/tabs';
 
 const GRID_COL = 2;
 const GRID_PADDING = 12;
 const GRID_GAP = 6;
 const GRID_ITEM_SIZE = (Dimensions.get('window').width - GRID_PADDING * 2 - GRID_GAP) / GRID_COL;
 
-type TabType = 'favorites' | 'reviews';
+type TabType = MyPageTabType;
 
 export default function MyPageScreen() {
   const { user, isLoggedIn, isLoading, authFetch } = useAuth();
@@ -21,7 +24,7 @@ export default function MyPageScreen() {
   const { setPendingShopId } = useMapStore();
   const { setReviewDetail } = useReviewStore();
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabType>('favorites');
+  const [activeTab, setActiveTab] = useState<TabType>(MY_PAGE_TAB.FAVORITES);
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
   const [reviews, setReviews] = useState<MyReview[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
@@ -42,7 +45,7 @@ export default function MyPageScreen() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#FF8C00" />
+        <ActivityIndicator size="large" color={AppColors.primary} />
       </View>
     );
   }
@@ -75,33 +78,33 @@ export default function MyPageScreen() {
 
       {/* 탭 */}
       <View style={styles.tabRow}>
-        <TouchableOpacity style={styles.tabBtn} onPress={() => setActiveTab('favorites')}>
-          <Text style={[styles.tabCount, activeTab === 'favorites' && styles.tabCountActive]}>
+        <TouchableOpacity style={styles.tabBtn} onPress={() => setActiveTab(MY_PAGE_TAB.FAVORITES)}>
+          <Text style={[styles.tabCount, activeTab === MY_PAGE_TAB.FAVORITES && styles.tabCountActive]}>
             {favorites.length}
           </Text>
-          <Text style={[styles.tabLabel, activeTab === 'favorites' && styles.tabLabelActive]}>
+          <Text style={[styles.tabLabel, activeTab === MY_PAGE_TAB.FAVORITES && styles.tabLabelActive]}>
             찜한 가게
           </Text>
-          {activeTab === 'favorites' && <View style={styles.tabIndicator} />}
+          {activeTab === MY_PAGE_TAB.FAVORITES && <View style={styles.tabIndicator} />}
         </TouchableOpacity>
 
         <View style={styles.tabDivider} />
 
-        <TouchableOpacity style={styles.tabBtn} onPress={() => setActiveTab('reviews')}>
+        <TouchableOpacity style={styles.tabBtn} onPress={() => setActiveTab(MY_PAGE_TAB.REVIEWS)}>
           <View style={styles.reviewStatRow}>
-            <Text style={[styles.tabCount, activeTab === 'reviews' && styles.tabCountActive]}>
+            <Text style={[styles.tabCount, activeTab === MY_PAGE_TAB.REVIEWS && styles.tabCountActive]}>
               {reviews.length}
             </Text>
             {user.avgRating != null && (
-              <Text style={[styles.avgRating, activeTab === 'reviews' && styles.tabCountActive]}>
+              <Text style={[styles.avgRating, activeTab === MY_PAGE_TAB.REVIEWS && styles.tabCountActive]}>
                 ( ⭐{user.avgRating.toFixed(1)} )
               </Text>
             )}
           </View>
-          <Text style={[styles.tabLabel, activeTab === 'reviews' && styles.tabLabelActive]}>
+          <Text style={[styles.tabLabel, activeTab === MY_PAGE_TAB.REVIEWS && styles.tabLabelActive]}>
             작성한 리뷰
           </Text>
-          {activeTab === 'reviews' && <View style={styles.tabIndicator} />}
+          {activeTab === MY_PAGE_TAB.REVIEWS && <View style={styles.tabIndicator} />}
         </TouchableOpacity>
       </View>
     </>
@@ -111,12 +114,12 @@ export default function MyPageScreen() {
     return (
       <View style={styles.container}>
         <ProfileHeader />
-        <ActivityIndicator style={{ marginTop: 48 }} color="#FF8C00" />
+        <ActivityIndicator style={{ marginTop: 48 }} color={AppColors.primary} />
       </View>
     );
   }
 
-  if (activeTab === 'favorites') {
+  if (activeTab === MY_PAGE_TAB.FAVORITES) {
     return (
       <View style={styles.container}>
         <FlatList
@@ -129,7 +132,7 @@ export default function MyPageScreen() {
               style={styles.row}
               onPress={() => {
                 setPendingShopId(item.shopId);
-                router.push('/(tabs)/my-map');
+                router.push(ROUTES.MAP);
               }}
             >
               {item.heroImageUrl
@@ -172,7 +175,7 @@ export default function MyPageScreen() {
               activeOpacity={0.85}
               onPress={() => {
                 setReviewDetail(reviews, index);
-                router.push('/my-page/review' as any);
+                router.push(ROUTES.MY_PAGE_REVIEW as any);
               }}
             >
               {imgUri
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
 
   profileSection: { alignItems: 'center', paddingBottom: 24, gap: 6 },
   avatar: { width: 80, height: 80, borderRadius: 40, marginBottom: 8 },
-  avatarFallback: { backgroundColor: '#FF8C00', alignItems: 'center', justifyContent: 'center' },
+  avatarFallback: { backgroundColor: AppColors.primary, alignItems: 'center', justifyContent: 'center' },
   avatarInitial: { fontSize: 32, color: '#fff', fontWeight: 'bold' },
   name: { fontSize: 20, fontWeight: 'bold' },
   email: { fontSize: 13, color: '#888' },
@@ -208,10 +211,10 @@ const styles = StyleSheet.create({
   tabRow: { flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   tabBtn: { flex: 1, alignItems: 'center', paddingVertical: 14, position: 'relative' },
   tabCount: { fontSize: 22, fontWeight: 'bold', color: '#ccc' },
-  tabCountActive: { color: '#FF8C00' },
+  tabCountActive: { color: AppColors.primary },
   tabLabel: { fontSize: 12, color: '#bbb', marginTop: 2 },
   tabLabelActive: { color: '#333' },
-  tabIndicator: { position: 'absolute', bottom: 0, width: '40%', height: 2, backgroundColor: '#FF8C00', borderRadius: 1 },
+  tabIndicator: { position: 'absolute', bottom: 0, width: '40%', height: 2, backgroundColor: AppColors.primary, borderRadius: 1 },
   tabDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0', alignSelf: 'center' },
   reviewStatRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4 },
   avgRating: { fontSize: 14, color: '#ccc', fontWeight: '500' },

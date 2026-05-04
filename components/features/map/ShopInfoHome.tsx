@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from "@expo/vector-icons";
 import ShopTagList from './ShopTagList';
-import { ShopTabType } from './ShopTabs';
+import { ShopTabType, SHOP_TAB } from '@/constants/tabs';
 
 interface Props {
   shop: any;
@@ -16,7 +16,7 @@ const ShopInfoHome = ({ shop, onTabChange }: Props) => {
     <ScrollView contentContainerStyle={styles.container}>
       <ShopTagList
         shopId={shop.shopId}
-        onPressMore={onTabChange ? () => onTabChange('리뷰') : undefined}
+        onPressMore={onTabChange ? () => onTabChange(SHOP_TAB.REVIEW) : undefined}
       />
       <InfoItem icon="location-outline" text={shop.address?.road || '주소 정보가 없습니다.'} />
       <InfoItem icon="time-outline" text={shop.hoursRaw || '영업시간 정보가 없습니다.'} />

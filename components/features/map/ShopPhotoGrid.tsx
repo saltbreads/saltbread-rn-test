@@ -5,6 +5,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShopPhotos } from "@/hooks/shop/useShopPhotos";
+import { AppColors } from '@/constants/theme';
 
 const { width:SCREEN_WIDTH } = Dimensions.get("window");
 // 1. 부모의 패딩(좌우 24씩 총 48)을 제외한 실제 가용 너비를 구합니다.
@@ -20,7 +21,7 @@ const ShopPhotoGrid = ({ shopId }: { shopId: string }) => {
     getPhotos();
   }, [getPhotos]);
 
-  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color="#FF8C00" />;
+  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
 
   // hero 사진과 일반 사진을 합쳐서 하나의 리스트로 만들거나, 
   // ListHeaderComponent를 활용해 hero를 배치할 수 있습니다.

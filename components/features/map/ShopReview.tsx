@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomAlertModal, { CustomAlertType } from "../modal/CustomAlertModal";
+import { AppColors } from '@/constants/theme';
 import ReviewCreateModal, {
   CreateReviewPayload,
 } from "../modal/ReviewCreateModal";
@@ -70,7 +71,7 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
   };
 
   if (isLoading) {
-    return <ActivityIndicator style={{ padding: 40 }} color="#FF8C00" />;
+    return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
   }
 
   const handleOpenReviewModal = () => {
@@ -260,13 +261,13 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
   },
   writeButton: {
-    backgroundColor: "#FFF4E5",
+    backgroundColor: AppColors.primaryBg,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
   },
   writeButtonText: {
-    color: "#FF8C00",
+    color: AppColors.primary,
     fontSize: 13,
     fontWeight: "700",
   },
@@ -301,13 +302,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   ratingBadge: {
-    backgroundColor: "#FFF4E5",
+    backgroundColor: AppColors.primaryBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   ratingText: {
-    color: "#FF8C00",
+    color: AppColors.primary,
     fontSize: 13,
     fontWeight: "700",
   },

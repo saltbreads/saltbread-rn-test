@@ -1,8 +1,8 @@
 // components/features/map/ShopTabs.tsx
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-
-export type ShopTabType = '홈' | '메뉴' | '리뷰' | '사진';
+import { SHOP_TAB, ShopTabType } from '@/constants/tabs';
+import { AppColors } from '@/constants/theme';
 
 interface Props {
   activeTab: ShopTabType;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const ShopTabs = ({ activeTab, onTabChange }: Props) => {
-  const tabs: ShopTabType[] = ['홈', '메뉴', '리뷰', '사진'];
+  const tabs: ShopTabType[] = [SHOP_TAB.HOME, SHOP_TAB.MENU, SHOP_TAB.REVIEW, SHOP_TAB.PHOTO];
 
   return (
     <View style={styles.container}>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '40%',
     height: 3,
-    backgroundColor: '#FF8C00',
+    backgroundColor: AppColors.primary,
     borderRadius: 2,
   },
 });
