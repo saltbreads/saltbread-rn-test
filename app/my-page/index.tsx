@@ -172,7 +172,7 @@ export default function MyPageScreen() {
               activeOpacity={0.85}
               onPress={() => {
                 setReviewDetail(reviews, index);
-                router.push('/my-page/review/index' as any);
+                router.push('/my-page/review' as any);
               }}
             >
               {imgUri
