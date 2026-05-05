@@ -70,10 +70,6 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
     }));
   };
 
-  if (isLoading) {
-    return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
-  }
-
   const handleOpenReviewModal = () => {
     if (!accessToken) {
       showAlert({
@@ -208,23 +204,26 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
         ListHeaderComponent={
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
-
-            <TouchableOpacity
-              style={styles.writeButton}
-              onPress={handleOpenReviewModal}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
-            </TouchableOpacity>
-          </View>
+          isLoading ? (
+            <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />
+          ) : (
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
+              <TouchableOpacity
+                style={styles.writeButton}
+                onPress={handleOpenReviewModal}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
+              </TouchableOpacity>
+            </View>
+          )
         }
-        ListEmptyComponent={
+        ListEmptyComponent={!isLoading ? (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>아직 작성된 리뷰가 없어요. ✍️</Text>
           </View>
-        }
+        ) : null}
       />
 
       <ReviewCreateModal

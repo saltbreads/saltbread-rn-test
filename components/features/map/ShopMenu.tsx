@@ -22,8 +22,6 @@ const ShopMenu = ({ shopId }: Props) => {
     getMenus();
   }, [getMenus]);
 
-  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
-
   const renderMenuItem = ({ item }: { item: ShopMenuData }) => (
     <View style={styles.menuItem}>
       <View style={styles.menuTextContent}>
@@ -58,12 +56,13 @@ const ShopMenu = ({ shopId }: Props) => {
       style={{ flex: 1 }} 
       // 👈 2. 컨텐츠 패딩: 하단 버튼에 메뉴 마지막 아이템이 가려지지 않게 여백을 넉넉히 줍니다.
       contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom }]} 
-      focusHook={useEffect} // 바텀시트 내부 포커스 최적화
-      ListEmptyComponent={
+      focusHook={useEffect}
+      ListHeaderComponent={isLoading ? <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} /> : null}
+      ListEmptyComponent={!isLoading ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>등록된 메뉴 정보가 없어요. 🥐</Text>
         </View>
-      }
+      ) : null}
     />
     
   );
