@@ -1,7 +1,7 @@
 // components/features/map/ShopDetailSheet.tsx
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -29,6 +29,11 @@ interface Props {
 const ShopDetailSheet = ({ shop, photos, isLoading }: Props) => {
   const [activeTab, setActiveTab] = useState<ShopTabType>(SHOP_TAB.HOME);
   const [contentHeight, setContentHeight] = useState(400);
+
+  // 가게가 바뀌면 탭을 홈으로 초기화
+  useEffect(() => {
+    setActiveTab(SHOP_TAB.HOME);
+  }, [shop?.shopId]);
 
   if (isLoading) {
     return (
