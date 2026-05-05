@@ -4,7 +4,6 @@ import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   Platform,
   StyleSheet,
   Text,
@@ -19,8 +18,7 @@ import { ShopTabType, SHOP_TAB } from "@/constants/tabs";
 import { AppColors } from "@/constants/theme";
 import ShopReview from "./ShopReview";
 import ShopPhotoGrid from "./ShopPhotoGrid";
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window"); // 화면 너비 가져오기
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/constants/layout';
 
 interface Props {
   shop: any;

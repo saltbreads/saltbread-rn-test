@@ -143,11 +143,7 @@ export function SearchHeader({ onSelectShop, mapLoading = false }: SearchHeaderP
 }
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: 40, // 상태바 위치 고려
-    left: 16,
-    right: 16,
-    zIndex: 100,
+    // 포지셔닝은 부모(my-map의 Animated.View)가 담당
   },
   searchBar: {
     flexDirection: "row",

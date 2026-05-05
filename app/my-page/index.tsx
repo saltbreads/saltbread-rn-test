@@ -1,6 +1,6 @@
 // app/my-page/index.tsx
 import { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
@@ -10,11 +10,12 @@ import { useReviewStore } from '@/store/useReviewStore';
 import { ROUTES } from '@/constants/routes';
 import { AppColors } from '@/constants/theme';
 import { MY_PAGE_TAB, MyPageTabType } from '@/constants/tabs';
+import { SCREEN_WIDTH } from '@/constants/layout';
 
 const GRID_COL = 2;
 const GRID_PADDING = 12;
 const GRID_GAP = 6;
-const GRID_ITEM_SIZE = (Dimensions.get('window').width - GRID_PADDING * 2 - GRID_GAP) / GRID_COL;
+const GRID_ITEM_SIZE = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / GRID_COL;
 
 type TabType = MyPageTabType;
 

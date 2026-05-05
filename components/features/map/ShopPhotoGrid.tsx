@@ -1,13 +1,12 @@
 // components/features/map/ShopPhotoGrid.tsx
 import React, { useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, Dimensions } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShopPhotos } from "@/hooks/shop/useShopPhotos";
 import { AppColors } from '@/constants/theme';
-
-const { width:SCREEN_WIDTH } = Dimensions.get("window");
+import { SCREEN_WIDTH } from '@/constants/layout';
 // 1. 부모의 패딩(좌우 24씩 총 48)을 제외한 실제 가용 너비를 구합니다.
 const REAL_WIDTH = SCREEN_WIDTH - 48; 
 // 2. 가용 너비를 3으로 나눕니다.
