@@ -1,5 +1,6 @@
 // components/features/map/ShopReview.tsx
 import { createShopReview, fetchAiTagSuggestions } from "@/api/review";
+import ShopTagList from "./ShopTagList";
 import { useAuth } from "@/context/AuthContext";
 import { useShopReviews } from "@/hooks/shop/useShopReviews";
 import { ShopReviewData } from "@/types/review";
@@ -207,15 +208,18 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
           isLoading ? (
             <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />
           ) : (
-            <View style={styles.headerContainer}>
-              <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
-              <TouchableOpacity
-                style={styles.writeButton}
-                onPress={handleOpenReviewModal}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
-              </TouchableOpacity>
+            <View>
+              <ShopTagList shopId={shopId} mode="expandable" />
+              <View style={styles.headerContainer}>
+                <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
+                <TouchableOpacity
+                  style={styles.writeButton}
+                  onPress={handleOpenReviewModal}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )
         }
