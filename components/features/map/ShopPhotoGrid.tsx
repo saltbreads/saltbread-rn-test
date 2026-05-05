@@ -1,7 +1,7 @@
 // components/features/map/ShopPhotoGrid.tsx
 import React, { useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { FlatList } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShopPhotos } from "@/hooks/shop/useShopPhotos";
@@ -20,12 +20,8 @@ const ShopPhotoGrid = ({ shopId }: { shopId: string }) => {
     getPhotos();
   }, [getPhotos]);
 
-  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
-
-  // hero 사진과 일반 사진을 합쳐서 하나의 리스트로 만들거나, 
-  // ListHeaderComponent를 활용해 hero를 배치할 수 있습니다.
-  const allPhotos = heroPhoto 
-    ? [{ id: 'hero', url: heroPhoto }, ...photos] 
+  const allPhotos = heroPhoto
+    ? [{ id: 'hero', url: heroPhoto }, ...photos]
     : photos;
 
   const renderPhotoItem = ({ item }: { item: any }) => (
@@ -35,13 +31,14 @@ const ShopPhotoGrid = ({ shopId }: { shopId: string }) => {
   );
 
   return (
-    <BottomSheetFlatList
+    <FlatList
       data={allPhotos}
       renderItem={renderPhotoItem}
-      keyExtractor={(item: { id: any; }) => item.id}
+      keyExtractor={(item: { id: any }) => item.id}
       numColumns={3}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
+      ListHeaderComponent={isLoading ? <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} /> : null}
     />
   );
 };

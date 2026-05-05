@@ -3,7 +3,7 @@ import { createShopReview, fetchAiTagSuggestions } from "@/api/review";
 import { useAuth } from "@/context/AuthContext";
 import { useShopReviews } from "@/hooks/shop/useShopReviews";
 import { ShopReviewData } from "@/types/review";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { FlatList } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import {
@@ -197,10 +197,10 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
 
   return (
     <>
-      <BottomSheetFlatList
+      <FlatList<ShopReviewData>
         data={reviews}
         renderItem={renderReviewItem}
-        keyExtractor={(item: { id: any }) => item.id}
+        keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
         ListHeaderComponent={
