@@ -1,7 +1,7 @@
 // components/features/map/ShopMenu.tsx
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { FlatList } from 'react-native-gesture-handler';
 import { Image } from 'expo-image';
 import { useShopMenus } from '@/hooks/shop/useShopMenus';
 import { ShopMenuData } from '@/types/shop'; 
@@ -21,8 +21,6 @@ const ShopMenu = ({ shopId }: Props) => {
   useEffect(() => {
     getMenus();
   }, [getMenus]);
-
-  if (isLoading) return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
 
   const renderMenuItem = ({ item }: { item: ShopMenuData }) => (
     <View style={styles.menuItem}>
@@ -50,7 +48,7 @@ const ShopMenu = ({ shopId }: Props) => {
 
   return (
     
-    <BottomSheetFlatList
+    <FlatList
       data={menus}
       renderItem={renderMenuItem}
       keyExtractor={(item: { id: any; }) => item.id}
@@ -58,12 +56,12 @@ const ShopMenu = ({ shopId }: Props) => {
       style={{ flex: 1 }} 
       // 👈 2. 컨텐츠 패딩: 하단 버튼에 메뉴 마지막 아이템이 가려지지 않게 여백을 넉넉히 줍니다.
       contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom }]} 
-      focusHook={useEffect} // 바텀시트 내부 포커스 최적화
-      ListEmptyComponent={
+      ListHeaderComponent={isLoading ? <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} /> : null}
+      ListEmptyComponent={!isLoading ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>등록된 메뉴 정보가 없어요. 🥐</Text>
         </View>
-      }
+      ) : null}
     />
     
   );

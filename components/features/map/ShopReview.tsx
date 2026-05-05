@@ -3,7 +3,7 @@ import { createShopReview, fetchAiTagSuggestions } from "@/api/review";
 import { useAuth } from "@/context/AuthContext";
 import { useShopReviews } from "@/hooks/shop/useShopReviews";
 import { ShopReviewData } from "@/types/review";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { FlatList } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import {
@@ -69,10 +69,6 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
       open: false,
     }));
   };
-
-  if (isLoading) {
-    return <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />;
-  }
 
   const handleOpenReviewModal = () => {
     if (!accessToken) {
@@ -201,30 +197,33 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
 
   return (
     <>
-      <BottomSheetFlatList
+      <FlatList<ShopReviewData>
         data={reviews}
         renderItem={renderReviewItem}
-        keyExtractor={(item: { id: any }) => item.id}
+        keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
         ListHeaderComponent={
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
-
-            <TouchableOpacity
-              style={styles.writeButton}
-              onPress={handleOpenReviewModal}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
-            </TouchableOpacity>
-          </View>
+          isLoading ? (
+            <ActivityIndicator style={{ padding: 40 }} color={AppColors.primary} />
+          ) : (
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>리뷰 {reviews.length}개</Text>
+              <TouchableOpacity
+                style={styles.writeButton}
+                onPress={handleOpenReviewModal}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.writeButtonText}>+ 리뷰 작성하기</Text>
+              </TouchableOpacity>
+            </View>
+          )
         }
-        ListEmptyComponent={
+        ListEmptyComponent={!isLoading ? (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>아직 작성된 리뷰가 없어요. ✍️</Text>
           </View>
-        }
+        ) : null}
       />
 
       <ReviewCreateModal
