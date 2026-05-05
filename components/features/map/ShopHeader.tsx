@@ -2,15 +2,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React, { useState, useEffect } from "react";
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 // 👈 중요: gorhom이 아닌 gesture-handler에서 직접 가져옵니다.
 import { FlatList } from "react-native-gesture-handler";
 import { useAuth } from "@/context/AuthContext";
 import { addFavorite, removeFavorite } from "@/api/favorites";
 import { fetchMyFavorites } from "@/api/users";
 import { AppColors } from '@/constants/theme';
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+import { SCREEN_WIDTH } from '@/constants/layout';
 const PHOTO_WIDTH = SCREEN_WIDTH - 48;
 const PHOTO_GAP = 16;
 

@@ -8,9 +8,15 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  interpolate,
+} from "react-native-reanimated";
 import NaverMapViewComponent from "../../components/features/map/NaverMapView";
 import { useMapStore } from "@/store/useMapStore";
 import { AppColors } from "@/constants/theme";
+import { SCREEN_HEIGHT } from '@/constants/layout';
 
 export default function MyMapScreen() {
   //useShops - 가게 x,y 정보 fetch하는 훅
@@ -30,6 +36,25 @@ export default function MyMapScreen() {
 
   // 1. 바텀 시트를 조절하기 위한 Ref
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // 바텀시트 Y 위치 → SearchHeader 연동
+  const animatedPosition = useSharedValue(SCREEN_HEIGHT);
+  const headerHeight = useSharedValue(0);
+
+  const headerStyle = useAnimatedStyle(() => {
+    // 측정된 실제 높이 + top 오프셋만큼 올리면 화면 밖으로 완전히 사라짐
+    const offset = 40 + headerHeight.value;
+    return {
+      transform: [{
+        translateY: interpolate(
+          animatedPosition.value,
+          [0, SCREEN_HEIGHT * 0.6, SCREEN_HEIGHT],
+          [-offset, 0, 0],
+          "clamp"
+        ),
+      }],
+    };
+  });
 
   // 2. 시트가 멈추는 높이 (35% 지점, 60% 지점)
   const snapPoints = useMemo(() => ["40%", "100%"], []);
@@ -59,46 +84,53 @@ export default function MyMapScreen() {
   );
 
   return (
-    // <SafeAreaView style={styles.safe} edges={["top"]}>
-    <View style={styles.container}>
-      {/* 상단 검색바 (로딩 중엔 프로필 아이콘 → 스피너) */}
-      <SearchHeader
-        onSelectShop={(shop) => handleMarkerPress(shop)}
-        mapLoading={isListLoading}
-      />
+    <View style={styles.root}>
+      {/* 지도 + 바텀시트 */}
+      <View style={styles.container}>
+        <NaverMapViewComponent
+          shops={shops}
+          onMarkerPress={handleMarkerPress}
+          ref={mapRef}
+          selectedShopId={selectedShopId}
+        />
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          animatedPosition={animatedPosition}
+          onChange={(index) => {
+            if (index === -1) clearSelection();
+          }}
+        >
+          <BottomSheetView>
+            <ShopDetailSheet
+              shop={selectedShop}
+              photos={photos}
+              isLoading={isDetailLoading}
+            />
+          </BottomSheetView>
+        </BottomSheet>
+      </View>
 
-      {/* 지도 (항상 표시) */}
-      <NaverMapViewComponent
-        shops={shops}
-        onMarkerPress={handleMarkerPress}
-        ref={mapRef}
-        selectedShopId={selectedShopId}
-      />
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        onChange={(index) => {
-          if (index === -1) clearSelection();
-        }}
+      {/* SearchHeader — root 레벨에서 위치해야 container 클리핑 영향 없이 위로 사라짐 */}
+      <Animated.View
+        style={[styles.headerWrapper, headerStyle]}
+        onLayout={(e) => { headerHeight.value = e.nativeEvent.layout.height; }}
       >
-        <BottomSheetView>
-          <ShopDetailSheet
-            shop={selectedShop}
-            photos={photos}
-            isLoading={isDetailLoading}
-          />
-        </BottomSheetView>
-      </BottomSheet>
+        <SearchHeader
+          onSelectShop={(shop) => handleMarkerPress(shop)}
+          mapLoading={isListLoading}
+        />
+      </Animated.View>
     </View>
-    // </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
   container: { flex: 1, backgroundColor: "#fff" },
+  headerWrapper: { position: "absolute", top: 40, left: 16, right: 16, zIndex: 100 },
   loading: { flex: 1, justifyContent: "center", alignItems: "center" },
   loadingOverlay: { position: "absolute", top: 100, alignSelf: "center", backgroundColor: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 8 },
   center: {
