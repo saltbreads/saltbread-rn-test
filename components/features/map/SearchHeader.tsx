@@ -40,7 +40,7 @@ export function SearchHeader({ onSelectShop, mapLoading = false }: SearchHeaderP
 
   // 거리계산
   const shopsWithDistance = useMemo(() => {
-    if (!searchResults) return [];
+    if (!searchResults || !Array.isArray(searchResults)) return [];
 
     return searchResults
       .map((shop) => {

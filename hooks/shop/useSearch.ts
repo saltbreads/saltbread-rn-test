@@ -23,12 +23,13 @@ export function useSearch(keyword: string, lat: number, lng: number) {
         const RADIUS = 10; // 10km 반경
         const LIMIT = 20; // 결과 20개 요청
 
-        const url = `${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.SHOP_SEARCH}?lat=${lat}&lng=${lng}&search=${keyword}&radiusKm=${RADIUS}&limit=${LIMIT}`;
+        const url = `${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.SHOP_SEARCH}?lat=${lat}&lng=${lng}&search=${encodeURIComponent(keyword)}&radiusKm=${RADIUS}&limit=${LIMIT}`;
         const response = await fetch(url);
         const resJson = await response.json();
         if (resJson.success) {
-          setSearchResults(resJson.data);
-          // console.log(resJson.data)
+          const data = resJson.data;
+          // data가 배열이면 그대로, {items:[]} 객체면 items 추출
+          setSearchResults(Array.isArray(data) ? data : (data?.items ?? []));
         }
       } catch (error) {
         console.error("실시간 검색 에러:", error);
