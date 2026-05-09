@@ -9,7 +9,6 @@ import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -176,22 +175,28 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
       {/* 리뷰 본문 */}
       <Text style={styles.content}>{item.content}</Text>
 
-      {/* 리뷰 이미지들 (가로 스크롤) */}
+      {/* 리뷰 이미지들 (최대 3개, 초과 시 +N 오버레이) */}
       {item.images?.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.imageScroll}
-        >
-          {item.images.map((img) => (
-            <Image
-              key={img.id}
-              source={{ uri: img.url }}
-              style={styles.reviewImage}
-              contentFit="cover"
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.imageRow}>
+          {item.images.slice(0, 3).map((img, idx) => {
+            const isLast = idx === 2;
+            const remaining = item.images.length - 3;
+            return (
+              <View key={img.id} style={styles.imageWrapper}>
+                <Image
+                  source={{ uri: img.url }}
+                  style={styles.reviewImage}
+                  contentFit="cover"
+                />
+                {isLast && remaining > 0 && (
+                  <View style={styles.imageOverlay}>
+                    <Text style={styles.imageOverlayText}>+{remaining}</Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
       )}
     </View>
   );
@@ -321,16 +326,22 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 12,
   },
-  imageScroll: {
-    flexDirection: "row",
-  },
+  imageRow: { flexDirection: "row", gap: 8, marginTop: 8 },
+  imageWrapper: { position: "relative" },
   reviewImage: {
     width: 100,
     height: 100,
     borderRadius: 8,
-    marginRight: 8,
     backgroundColor: "#F9F9F9",
   },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 8,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  imageOverlayText: { color: "#fff", fontSize: 20, fontWeight: "bold" },
   empty: {
     alignItems: "center",
     paddingVertical: 60,
