@@ -326,14 +326,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 12,
   },
-  imageRow: { flexDirection: "row", gap: 8, marginTop: 8 },
-  imageWrapper: { position: "relative" },
-  reviewImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-    backgroundColor: "#F9F9F9",
-  },
+  imageRow: { flexDirection: "row", gap: 6, marginTop: 8 },
+  imageWrapper: { flex: 1, aspectRatio: 1, borderRadius: 8, overflow: "hidden" },
+  reviewImage: { width: "100%", height: "100%", backgroundColor: "#F9F9F9" },
   imageOverlay: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 8,
