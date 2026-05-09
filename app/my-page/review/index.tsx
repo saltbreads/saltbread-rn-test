@@ -1,30 +1,53 @@
 // app/my-page/review/index.tsx
-import { useEffect, useRef } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReviewStore } from '@/store/useReviewStore';
+import { useAuth } from '@/context/AuthContext';
+import { fetchMyReviews, MyReview } from '@/api/users';
 import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
-import { MyReview } from '@/api/users';
 import { AppColors } from '@/constants/theme';
 
 export default function ReviewDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { reviews, selectedIndex, clear } = useReviewStore();
+  const { authFetch } = useAuth();
+  const { selectedReviewId, clear } = useReviewStore();
   const listRef = useRef<FlatList<MyReview>>(null);
 
+  const [reviews, setReviews] = useState<MyReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const scrolledRef = useRef(false);
+
+  // 전체 리뷰 한 번에 로드 (플래시 없이 선택 위치로 바로 이동)
   useEffect(() => {
-    if (reviews.length === 0 || selectedIndex === 0) return;
-    setTimeout(() => {
-      listRef.current?.scrollToIndex({ index: selectedIndex, animated: false });
-    }, 100);
+    fetchMyReviews(authFetch, { page: 1, limit: 100 }).then((data) => {
+      setReviews(data?.items ?? []);
+      setLoading(false);
+    });
   }, []);
+
+  // FlatList 렌더 완료 후 선택한 리뷰로 스크롤
+  useEffect(() => {
+    if (loading || scrolledRef.current || !selectedReviewId) return;
+    const idx = reviews.findIndex((r) => r.id === selectedReviewId);
+    if (idx <= 0) {
+      scrolledRef.current = true;
+      setVisible(true);
+      return;
+    }
+    setTimeout(() => {
+      listRef.current?.scrollToIndex({ index: idx, animated: false });
+      scrolledRef.current = true;
+      setTimeout(() => setVisible(true), 50); // 스크롤 적용 후 표시
+    }, 200);
+  }, [loading, reviews]);
 
   const renderItem = ({ item }: { item: MyReview }) => (
     <View style={styles.card}>
-      {/* 가게 정보 */}
       <View style={styles.shopRow}>
         {item.shop.heroImageUrl
           ? <Image source={{ uri: item.shop.heroImageUrl }} style={styles.shopThumb} />
@@ -36,7 +59,6 @@ export default function ReviewDetailScreen() {
         </View>
       </View>
 
-      {/* 별점 */}
       <View style={styles.ratingRow}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Ionicons key={i} name={i < item.rating ? 'star' : 'star-outline'} size={16} color={AppColors.primary} />
@@ -44,10 +66,8 @@ export default function ReviewDetailScreen() {
         <Text style={styles.ratingText}>{item.rating}.0</Text>
       </View>
 
-      {/* 리뷰 내용 */}
       <Text style={styles.content}>{item.content}</Text>
 
-      {/* 태그 */}
       {item.tags.length > 0 && (
         <View style={styles.tagRow}>
           {item.tags.map((tag) => (
@@ -58,7 +78,6 @@ export default function ReviewDetailScreen() {
         </View>
       )}
 
-      {/* 리뷰 이미지 */}
       {item.images.length > 0 && (
         <View style={styles.imageRow}>
           {item.images.map((img) => (
@@ -73,7 +92,6 @@ export default function ReviewDetailScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => { clear(); router.back(); }}>
           <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
@@ -82,15 +100,25 @@ export default function ReviewDetailScreen() {
         <View style={{ width: 26 }} />
       </View>
 
-      <FlatList
-        ref={listRef}
-        data={reviews}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        onScrollToIndexFailed={() => {}}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+      {(loading || !visible) && (
+        <ActivityIndicator style={[StyleSheet.absoluteFillObject, { backgroundColor: '#fff', zIndex: 1 }]} color={AppColors.primary} />
+      )}
+      {!loading && (
+        <FlatList
+          style={{ flex: 1, opacity: visible ? 1 : 0 }}
+          ref={listRef}
+          data={reviews}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          onScrollToIndexFailed={(info) => {
+            setTimeout(() => {
+              listRef.current?.scrollToIndex({ index: info.index, animated: false });
+            }, 300);
+          }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </View>
   );
 }

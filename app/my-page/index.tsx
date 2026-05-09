@@ -23,25 +23,47 @@ export default function MyPageScreen() {
   const { user, isLoggedIn, isLoading, authFetch } = useAuth();
   const router = useRouter();
   const { setPendingShopId } = useMapStore();
-  const { setReviewDetail } = useReviewStore();
+  const { setSelectedReview } = useReviewStore();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabType>(MY_PAGE_TAB.FAVORITES);
   const [favorites, setFavorites] = useState<FavoriteShop[]>([]);
+  const [favLoading, setFavLoading] = useState(false);
+
   const [reviews, setReviews] = useState<MyReview[]>([]);
-  const [dataLoading, setDataLoading] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewPageLoading, setReviewPageLoading] = useState(false);
+  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewHasNext, setReviewHasNext] = useState(true);
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    setDataLoading(true);
-    Promise.all([
-      fetchMyFavorites(authFetch),
-      fetchMyReviews(authFetch),
-    ]).then(([favData, reviewData]) => {
-      setFavorites(favData);
-      setReviews(reviewData?.items ?? []);
-      setDataLoading(false);
+    setFavLoading(true);
+    fetchMyFavorites(authFetch).then((data) => {
+      setFavorites(data);
+      setFavLoading(false);
     });
   }, [isLoggedIn, authFetch]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    setReviewLoading(true);
+    fetchMyReviews(authFetch, { page: 1, limit: 10 }).then((data) => {
+      setReviews(data?.items ?? []);
+      setReviewHasNext(data?.hasNext ?? false);
+      setReviewLoading(false);
+    });
+  }, [isLoggedIn, authFetch]);
+
+  const loadMoreReviews = async () => {
+    if (!reviewHasNext || reviewPageLoading) return;
+    const nextPage = reviewPage + 1;
+    setReviewPageLoading(true);
+    const data = await fetchMyReviews(authFetch, { page: nextPage, limit: 10 });
+    setReviews((prev) => [...prev, ...(data?.items ?? [])]);
+    setReviewHasNext(data?.hasNext ?? false);
+    setReviewPage(nextPage);
+    setReviewPageLoading(false);
+  };
 
   if (isLoading) {
     return (
@@ -94,7 +116,7 @@ export default function MyPageScreen() {
         <TouchableOpacity style={styles.tabBtn} onPress={() => setActiveTab(MY_PAGE_TAB.REVIEWS)}>
           <View style={styles.reviewStatRow}>
             <Text style={[styles.tabCount, activeTab === MY_PAGE_TAB.REVIEWS && styles.tabCountActive]}>
-              {reviews.length}
+              {user.reviewCount}
             </Text>
             {user.avgRating != null && (
               <Text style={[styles.avgRating, activeTab === MY_PAGE_TAB.REVIEWS && styles.tabCountActive]}>
@@ -111,7 +133,7 @@ export default function MyPageScreen() {
     </>
   );
 
-  if (dataLoading) {
+  if (reviewLoading || favLoading) {
     return (
       <View style={styles.container}>
         <ProfileHeader />
@@ -167,7 +189,7 @@ export default function MyPageScreen() {
         numColumns={2}
         ListHeaderComponent={<ProfileHeader />}
         columnWrapperStyle={{ gap: GRID_GAP, paddingHorizontal: GRID_PADDING }}
-        renderItem={({ item, index }) => {
+        renderItem={({ item }) => {
           const imgUri = item.images[0]?.url ?? item.shop.heroImageUrl;
           const region = item.shop.roadAddress?.split(' ').slice(0, 3).join(' ') ?? '';
           return (
@@ -175,7 +197,7 @@ export default function MyPageScreen() {
               style={styles.gridItem}
               activeOpacity={0.85}
               onPress={() => {
-                setReviewDetail(reviews, index);
+                setSelectedReview(item.id);
                 router.push(ROUTES.MY_PAGE_REVIEW as any);
               }}
             >
@@ -192,6 +214,9 @@ export default function MyPageScreen() {
         }}
         ListEmptyComponent={<Text style={styles.emptyText}>아직 작성한 리뷰가 없어요.</Text>}
         contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+        onEndReached={loadMoreReviews}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={reviewPageLoading ? <ActivityIndicator style={{ padding: 16 }} color={AppColors.primary} /> : null}
       />
     </View>
   );

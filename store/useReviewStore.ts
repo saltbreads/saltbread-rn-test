@@ -1,17 +1,14 @@
 // store/useReviewStore.ts
 import { create } from 'zustand';
-import { MyReview } from '@/api/users';
 
 interface ReviewStore {
-  reviews: MyReview[];
-  selectedIndex: number;
-  setReviewDetail: (reviews: MyReview[], index: number) => void;
+  selectedReviewId: string | null;
+  setSelectedReview: (reviewId: string) => void;
   clear: () => void;
 }
 
 export const useReviewStore = create<ReviewStore>((set) => ({
-  reviews: [],
-  selectedIndex: 0,
-  setReviewDetail: (reviews, index) => set({ reviews, selectedIndex: index }),
-  clear: () => set({ reviews: [], selectedIndex: 0 }),
+  selectedReviewId: null,
+  setSelectedReview: (reviewId) => set({ selectedReviewId: reviewId }),
+  clear: () => set({ selectedReviewId: null }),
 }));
