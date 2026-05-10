@@ -30,6 +30,9 @@ export const BASE_URL = {
     REVIEWS: (shopId: string) => `/shops/${shopId}/reviews`,
     REVIEW_TAGS: (shopId: string) => `/shops/${shopId}/review-tags`,
     AI_TAG_SUGGESTIONS: "/reviews/ai-tag-suggestions",
+    REVIEW_LIKE: (reviewId: string) => `/reviews/${reviewId}/like`,
+    REVIEW_COMMENTS: (reviewId: string) => `/reviews/${reviewId}/comments`,
+    REVIEW_COMMENT_DELETE: (commentId: string) => `/reviews/comments/${commentId}`,
 
     // 인증 관련
     AUTH_GOOGLE: "/auth/google",

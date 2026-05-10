@@ -1,5 +1,6 @@
 // components/features/map/ShopReview.tsx
-import { createShopReview, fetchAiTagSuggestions } from "@/api/review";
+import { createShopReview, fetchAiTagSuggestions, likeReview, unlikeReview } from "@/api/review";
+import ReviewCommentSection from "@/components/features/review/ReviewCommentSection";
 import ShopTagList from "./ShopTagList";
 import { useAuth } from "@/context/AuthContext";
 import { useShopReviews } from "@/hooks/shop/useShopReviews";
@@ -40,7 +41,7 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
     message: "",
   });
 
-  const { reviews, isLoading, getReviews } = useShopReviews(shopId);
+  const { reviews, setReviews, isLoading, getReviews } = useShopReviews(shopId, accessToken);
 
   useEffect(() => {
     getReviews();
@@ -150,6 +151,32 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
     return result.items;
   };
 
+  const handleLike = async (review: ShopReviewData) => {
+    if (!accessToken) return;
+    const liked = review.isLikedByMe;
+    // 낙관적 업데이트
+    setReviews((prev) =>
+      prev.map((r) =>
+        r.id === review.id
+          ? { ...r, isLikedByMe: !liked, likeCount: liked ? r.likeCount - 1 : r.likeCount + 1 }
+          : r
+      )
+    );
+    const ok = liked
+      ? await unlikeReview(review.id, accessToken)
+      : await likeReview(review.id, accessToken);
+    if (!ok) {
+      // 실패 시 롤백
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === review.id
+            ? { ...r, isLikedByMe: liked, likeCount: review.likeCount }
+            : r
+        )
+      );
+    }
+  };
+
   const renderReviewItem = ({ item }: { item: ShopReviewData }) => (
     <View style={styles.reviewCard}>
       {/* 유저 정보 영역 */}
@@ -198,6 +225,16 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
           })}
         </View>
       )}
+
+      {/* 좋아요 + 댓글 */}
+      <ReviewCommentSection
+        likeCount={item.likeCount ?? 0}
+        commentCount={item.commentCount ?? 0}
+        isLikedByMe={item.isLikedByMe ?? false}
+        comments={item.comments ?? []}
+        mode="preview"
+        onLikePress={() => handleLike(item)}
+      />
     </View>
   );
 

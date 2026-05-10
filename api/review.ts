@@ -219,3 +219,50 @@ export const fetchAiTagSuggestions = async ({
     return { items: [] };
   }
 };
+
+// 좋아요
+export const likeReview = async (reviewId: string, accessToken: string): Promise<boolean> => {
+  try {
+    const res = await fetch(`${API_URL}${ENDPOINTS.REVIEW_LIKE(reviewId)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return res.ok;
+  } catch { return false; }
+};
+
+export const unlikeReview = async (reviewId: string, accessToken: string): Promise<boolean> => {
+  try {
+    const res = await fetch(`${API_URL}${ENDPOINTS.REVIEW_LIKE(reviewId)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return res.ok;
+  } catch { return false; }
+};
+
+// 댓글
+export const postComment = async (
+  reviewId: string,
+  content: string,
+  accessToken: string
+): Promise<boolean> => {
+  try {
+    const res = await fetch(`${API_URL}${ENDPOINTS.REVIEW_COMMENTS(reviewId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ content }),
+    });
+    return res.ok;
+  } catch { return false; }
+};
+
+export const deleteComment = async (commentId: string, accessToken: string): Promise<boolean> => {
+  try {
+    const res = await fetch(`${API_URL}${ENDPOINTS.REVIEW_COMMENT_DELETE(commentId)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return res.ok;
+  } catch { return false; }
+};

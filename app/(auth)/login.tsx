@@ -77,7 +77,7 @@ export default function LoginScreen() {
 
       <WebView
         source={{ uri: `${BASE_URL.API_URL}${BASE_URL.ENDPOINTS.AUTH_GOOGLE}` }}
-        // incognito={true} // 시크릿모드 (쿠키/캐시저장안함)
+        incognito={true} // 시크릿모드 (쿠키/캐시저장안함)
 
         // [필수 추가] 이게 있어야 renderLoading이 작동합니다!
         startInLoadingState={true}
