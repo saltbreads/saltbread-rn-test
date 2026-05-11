@@ -220,6 +220,24 @@ export const fetchAiTagSuggestions = async ({
   }
 };
 
+// 전체 댓글 목록
+export const fetchComments = async (
+  reviewId: string,
+  page = 1,
+  limit = 20
+) => {
+  try {
+    const res = await fetch(
+      `${API_URL}${ENDPOINTS.REVIEW_COMMENTS(reviewId)}?page=${page}&limit=${limit}`
+    );
+    const json = await res.json();
+    if (json.success && json.data) return json.data;
+    return { items: [], hasNext: false };
+  } catch {
+    return { items: [], hasNext: false };
+  }
+};
+
 // 좋아요
 export const likeReview = async (reviewId: string, accessToken: string): Promise<boolean> => {
   try {

@@ -12,6 +12,7 @@ interface Props {
   isLikedByMe: boolean;
   comments: ReviewComment[];
   onLikePress?: () => void;
+  onCommentPress?: () => void;
   // collapsible: 내가 쓴 리뷰 탭처럼 기본 닫힌 상태
   // preview: 가게 리뷰 탭처럼 상위 3개 보이는 상태
   mode?: 'collapsible' | 'preview';
@@ -25,6 +26,7 @@ export default function ReviewCommentSection({
   isLikedByMe,
   comments,
   onLikePress,
+  onCommentPress,
   mode = 'preview',
 }: Props) {
   const [expanded, setExpanded] = useState(mode === 'preview');
@@ -44,10 +46,10 @@ export default function ReviewCommentSection({
           />
           <Text style={[styles.statText, isLikedByMe && styles.likedText]}>{likeCount}</Text>
         </TouchableOpacity>
-        <View style={styles.stat}>
+        <TouchableOpacity style={styles.stat} onPress={onCommentPress} disabled={!onCommentPress}>
           <Ionicons name="chatbubble-outline" size={14} color="#888" />
           <Text style={styles.statText}>{commentCount}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* 댓글 목록 */}
@@ -71,8 +73,14 @@ export default function ReviewCommentSection({
         </View>
       ))}
 
-      {/* 펼치기 / 접기 */}
-      {hasMore && (
+      {/* preview: 댓글 더보기 → 모달 / collapsible: 인라인 펼치기·접기 */}
+      {hasMore && mode === 'preview' && (
+        <TouchableOpacity style={styles.toggleBtn} onPress={onCommentPress}>
+          <Text style={styles.toggleText}>댓글 {commentCount - PREVIEW_COUNT}개 더보기</Text>
+          <Ionicons name="chevron-forward" size={14} color={AppColors.primary} />
+        </TouchableOpacity>
+      )}
+      {hasMore && mode === 'collapsible' && (
         <TouchableOpacity style={styles.toggleBtn} onPress={() => setExpanded((v) => !v)}>
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}

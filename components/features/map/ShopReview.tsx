@@ -1,6 +1,7 @@
 // components/features/map/ShopReview.tsx
 import { createShopReview, fetchAiTagSuggestions, likeReview, unlikeReview } from "@/api/review";
 import ReviewCommentSection from "@/components/features/review/ReviewCommentSection";
+import ReviewCommentModal from "@/components/features/review/ReviewCommentModal";
 import ShopTagList from "./ShopTagList";
 import { useAuth } from "@/context/AuthContext";
 import { useShopReviews } from "@/hooks/shop/useShopReviews";
@@ -28,6 +29,7 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [commentModalReview, setCommentModalReview] = useState<{ id: string; count: number } | null>(null);
 
   const [alertState, setAlertState] = useState<{
     open: boolean;
@@ -234,6 +236,7 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
         comments={item.comments ?? []}
         mode="preview"
         onLikePress={() => handleLike(item)}
+        onCommentPress={() => setCommentModalReview({ id: item.id, count: item.commentCount ?? 0 })}
       />
     </View>
   );
@@ -288,6 +291,20 @@ const ShopReview = ({ shopId }: { shopId: string }) => {
         confirmText="확인"
         onConfirmAction={closeAlert}
       />
+
+      {commentModalReview && (
+        <ReviewCommentModal
+          visible={!!commentModalReview}
+          reviewId={commentModalReview.id}
+          commentCount={commentModalReview.count}
+          accessToken={accessToken}
+          onClose={() => setCommentModalReview(null)}
+          onCommentAdded={() => {
+            setCommentModalReview((prev) => prev ? { ...prev, count: prev.count + 1 } : null);
+            getReviews();
+          }}
+        />
+      )}
     </>
   );
 };
