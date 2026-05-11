@@ -1,6 +1,7 @@
 // api/users.ts
 import { BASE_URL } from "@/constants/config";
 import { AuthFetchFn } from "@/context/AuthContext";
+import { ReviewComment } from "@/types/review";
 
 const { API_URL, ENDPOINTS } = BASE_URL;
 
@@ -42,6 +43,10 @@ export interface MyReview {
     heroImageUrl: string | null;
   };
   createdAt: string;
+  likeCount: number;
+  commentCount: number;
+  isLikedByMe: boolean;
+  comments: ReviewComment[];
 }
 
 export interface MyReviewsResponse {
