@@ -1,6 +1,6 @@
 // components/features/review/ReviewCommentSection.tsx
 // 리뷰 카드 하단: 좋아요 수 + 댓글 상위 3개 + 펼치기/접기
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ReviewComment } from '@/types/review';
@@ -29,9 +29,7 @@ export default function ReviewCommentSection({
   onCommentPress,
   mode = 'preview',
 }: Props) {
-  const [expanded, setExpanded] = useState(mode === 'preview');
-
-  const visible = expanded ? comments : comments.slice(0, PREVIEW_COUNT);
+  const visible = comments.slice(0, PREVIEW_COUNT);
   const hasMore = commentCount > PREVIEW_COUNT;
 
   return (
@@ -80,16 +78,12 @@ export default function ReviewCommentSection({
           <Ionicons name="chevron-forward" size={14} color={AppColors.primary} />
         </TouchableOpacity>
       )}
-      {hasMore && mode === 'collapsible' && (
-        <TouchableOpacity style={styles.toggleBtn} onPress={() => setExpanded((v) => !v)}>
-          <Ionicons
-            name={expanded ? 'chevron-up' : 'chevron-down'}
-            size={18}
-            color={AppColors.primary}
-          />
+      {mode === 'collapsible' && (
+        <TouchableOpacity style={styles.toggleBtn} onPress={onCommentPress}>
           <Text style={styles.toggleText}>
-            {expanded ? '접기' : `댓글 ${commentCount - PREVIEW_COUNT}개 더보기`}
+            {hasMore ? `댓글 ${commentCount - PREVIEW_COUNT}개 더보기` : '댓글 달기'}
           </Text>
+          <Ionicons name="chevron-forward" size={14} color={AppColors.primary} />
         </TouchableOpacity>
       )}
     </View>

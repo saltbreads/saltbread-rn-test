@@ -7,17 +7,43 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReviewStore } from '@/store/useReviewStore';
 import { useAuth } from '@/context/AuthContext';
 import { fetchMyReviews, MyReview } from '@/api/users';
+import { likeReview, unlikeReview } from '@/api/review';
 import { REVIEW_TAG_EMOJI } from '@/constants/reviewTags';
 import { AppColors } from '@/constants/theme';
+import ReviewCommentSection from '@/components/features/review/ReviewCommentSection';
+import ReviewCommentModal from '@/components/features/review/ReviewCommentModal';
 
 export default function ReviewDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { authFetch } = useAuth();
+  const { authFetch, accessToken } = useAuth();
   const { selectedReviewId, clear } = useReviewStore();
   const listRef = useRef<FlatList<MyReview>>(null);
 
   const [reviews, setReviews] = useState<MyReview[]>([]);
+  const [commentModalReview, setCommentModalReview] = useState<{ id: string; count: number } | null>(null);
+
+  const handleLike = async (review: MyReview) => {
+    if (!accessToken) return;
+    const liked = review.isLikedByMe;
+    setReviews((prev) =>
+      prev.map((r) =>
+        r.id === review.id
+          ? { ...r, isLikedByMe: !liked, likeCount: liked ? r.likeCount - 1 : r.likeCount + 1 }
+          : r
+      )
+    );
+    const ok = liked
+      ? await unlikeReview(review.id, accessToken)
+      : await likeReview(review.id, accessToken);
+    if (!ok) {
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === review.id ? { ...r, isLikedByMe: liked, likeCount: review.likeCount } : r
+        )
+      );
+    }
+  };
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
   const scrolledRef = useRef(false);
@@ -87,6 +113,16 @@ export default function ReviewDetailScreen() {
       )}
 
       <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</Text>
+
+      <ReviewCommentSection
+        likeCount={item.likeCount ?? 0}
+        commentCount={item.commentCount ?? 0}
+        isLikedByMe={item.isLikedByMe ?? false}
+        comments={item.comments ?? []}
+        mode="collapsible"
+        onLikePress={() => handleLike(item)}
+        onCommentPress={() => setCommentModalReview({ id: item.id, count: item.commentCount ?? 0 })}
+      />
     </View>
   );
 
@@ -117,6 +153,26 @@ export default function ReviewDetailScreen() {
           }}
           contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
+
+      {commentModalReview && (
+        <ReviewCommentModal
+          visible={!!commentModalReview}
+          reviewId={commentModalReview.id}
+          commentCount={commentModalReview.count}
+          accessToken={accessToken}
+          onClose={() => setCommentModalReview(null)}
+          onCommentAdded={() => {
+            setCommentModalReview((prev) => prev ? { ...prev, count: prev.count + 1 } : null);
+            setReviews((prev) =>
+              prev.map((r) =>
+                r.id === commentModalReview?.id
+                  ? { ...r, commentCount: (r.commentCount ?? 0) + 1 }
+                  : r
+              )
+            );
+          }}
         />
       )}
     </View>
